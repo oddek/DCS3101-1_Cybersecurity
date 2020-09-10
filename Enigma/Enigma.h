@@ -1,4 +1,3 @@
-
 #ifndef ENIGMA_H
 #define ENIGMA_H
 #include "Rotor.h"
@@ -23,6 +22,4 @@ private:
 	void rotateRotors();
 	char charThroughPlugboard(char c);
 };
-
-
 #endif

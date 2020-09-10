@@ -1,6 +1,5 @@
 #include <string>
 #include <iostream>
-#include <memory>
 #include "Rotor.h"
 #include "Enigma.h"
 

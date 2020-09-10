@@ -55,7 +55,6 @@ static const char stepPoints[] =
 	'A' //Have to add another stepping point at 'N' for this
 };
 
-
 static const std::string reflectorAlphabets[] = 
 {
 	"", //Dummy alphabet

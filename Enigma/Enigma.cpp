@@ -118,5 +118,3 @@ char Enigma::charThroughPlugboard(char c)
 	}
 	return c;
 }
-
-
