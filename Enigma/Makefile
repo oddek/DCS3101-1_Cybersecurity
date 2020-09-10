@@ -3,7 +3,7 @@ CC = g++
 CPPFLAGS = -I /usr/include -L /usr/lib
 LDFLAGS = 
 
-OBJS = main.o Rotor.o
+OBJS = main.o Rotor.o Enigma.o
 all: build run
 run:
 	./$(PROG)
