@@ -18,22 +18,21 @@ Enigma::~Enigma()
 
 void Enigma::printEnigmaStatus()
 {
-	std::cout << "Enigma Status: \nPlugboard: \n";
+	std::cout << "Enigma Status: \n\tPlugboard: \n\t";
 	for(auto pair : plugboardSettings)
 	{
 		std::cout << pair << " ";
 	} 
 
-	std::cout << "\nRotor information from left to right: \n\n";
+	std::cout << "\n\nRotor information from left to right: \n\n";
 
 	for(auto rotor : rotors)
 	{
 		rotor.printRotorStatus();
 	} 
+
+	reflector.printRotorStatus();
 }
-
-
-
 
 void Enigma::setRotors(int r[3])
 {
@@ -75,7 +74,6 @@ void Enigma::rotateRotors()
 	//printRotorStatus();
 	
 }
-
 
 std::string Enigma::transform(std::string& input)
 {

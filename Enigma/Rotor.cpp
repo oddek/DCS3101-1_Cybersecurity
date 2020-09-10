@@ -1,6 +1,5 @@
 #include "Rotor.h"
 
-
 Rotor::Rotor()
 {
 
@@ -8,14 +7,16 @@ Rotor::Rotor()
 
 Rotor::Rotor(int _id, char _pos)
 {
-	rotorId = _id;
+	
 	rotorPosition = _pos;
 	if(_pos == 'r')
 	{
+		rotorId = _id;
 		alphabet = reflectorAlphabets[_id];
 	}
 	else
 	{
+		rotorId = _id;
 		alphabet = rotorAlphabets[_id];
 	}
 	ringSetting = 0;
@@ -27,7 +28,6 @@ Rotor::~Rotor()
 {
 
 }
-
 
 int Rotor::modulo(const int& a, const int& b)
 {
@@ -115,11 +115,20 @@ int Rotor::charToAlphabetIndex(char c)
 
 void Rotor::printRotorStatus()
 {
-	std::cout << "\tRotorID: " << rotorId << "\n";
-	std::cout << "\t\tStepping point: " << steppingPoint << "\n";
-	std::cout << "\t\tCurrent offset: " << offset << "\n";
-	std::cout << "\t\tCurrent RingSetting: " << ringSetting << "\n";
-	std::cout << "\t\tAlhpabet: " << alphabet << "\n\n\n";
+	if(rotorPosition == 'r')
+	{
+		std::cout << "\tReflector: "<< rotorId << "\n";
+		std::cout << "\t\tAlphabet: " << alphabet << "\n\n\n";
+	}
+	else
+	{
+		std::cout << "\t" << rotorPosition << "-rotor\n";
+		std::cout << "\t\tRotorId: " << rotorId << "\n";
+		std::cout << "\t\tStepping point: " << steppingPoint << "\n";
+		std::cout << "\t\tCurrent offset:" << offset << "\n";
+		std::cout << "\t\tCurrent RingSetting: " << ringSetting << "\n";
+		std::cout << "\t\tAlphabet: " << alphabet << "\n\n\n";
+	}
 }
 //If the middle rotor is at the position before it is supposed to step the next, it shall just step to the next;
 bool Rotor::isDoubleStep()
