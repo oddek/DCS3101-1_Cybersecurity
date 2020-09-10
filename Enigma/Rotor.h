@@ -45,9 +45,11 @@ public:
 	char getTransformedChar(char c);
 	char getInverseTransformedChar(char c);
 	void setRingSetting(int i);
-	bool incrementOffset();
+	bool incrementOffset(bool doubleStep);
 	void setOffset(int i);
 	void printRotorStatus();
+	bool isDoubleStep();
+
 
 	
 private:

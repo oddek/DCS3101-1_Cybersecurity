@@ -59,10 +59,10 @@ void Enigma::rotateRotors()
 {	
 	for(auto it = rotors.rbegin(); it != rotors.rend(); it++)
 	{
-		bool next = it->incrementOffset();
+		bool next = it->incrementOffset(rotors.at(1).isDoubleStep());
 		if(!next) break;
 	}	
-	printRotorStatus();
+	//printRotorStatus();
 	
 }
 
@@ -96,7 +96,7 @@ std::string Enigma::transform(std::string& input)
 		
 
 		//temp = rotors.at(0).getInverseTransformedChar(temp);
-		std::cout << "Input: " << c << " became: " << temp << "\n";
+		//std::cout << "Input: " << c << " became: " << temp << "\n";
 		output += temp;
 	}
 	return output;
