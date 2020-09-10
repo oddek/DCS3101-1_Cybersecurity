@@ -92,7 +92,6 @@ bool Rotor::incrementOffset(bool doubleStep)
 	//If this is the rightmost rotor, and the middle rotor is in doublestep position, we also have to return true;
 	if(offset == steppingPoint || rotorPosition == 'R' && doubleStep) 
 	{
-		std::cout << "Rotor " << rotorPosition << " at stepPoint: " << steppingPoint << "\n";
 		return true;
 	}
 	return false;

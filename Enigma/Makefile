@@ -1,5 +1,6 @@
 PROG = Enigma
 CC = g++
+CXXFLAGS = -std=c++17
 CPPFLAGS = -I /usr/include -L /usr/lib
 LDFLAGS = 
 
@@ -11,7 +12,7 @@ run:
 build: $(PROG)
 
 $(PROG): $(OBJS)
-	g++ -o $@ $(OBJS) $(LDFLAGS)
+	$(CC) $(CXXFLAGS) -o $@ $(OBJS) $(LDFLAGS)
 
 clean:
 	rm -f *stackdump $(PROG) *.o .depend

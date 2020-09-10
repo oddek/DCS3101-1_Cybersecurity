@@ -1,6 +1,6 @@
 #include "Enigma.h"
 
-Enigma::Enigma(int rotorIds[3], int reflectorId): reflector(reflectorId, 'r')
+Enigma::Enigma(int rotorIds[3], int reflectorId, std::vector<std::string> _plugboardSettings): reflector(reflectorId, 'r')
 {
 	Rotor rotor1(rotorIds[0], 'L');
 	Rotor rotor2(rotorIds[1], 'M');
@@ -8,6 +8,7 @@ Enigma::Enigma(int rotorIds[3], int reflectorId): reflector(reflectorId, 'r')
 	rotors.push_back(rotor1);
 	rotors.push_back(rotor2);
 	rotors.push_back(rotor3);
+	plugboardSettings = _plugboardSettings;
 }
 
 Enigma::~Enigma()
@@ -15,15 +16,24 @@ Enigma::~Enigma()
 
 }
 
-void Enigma::printRotorStatus()
+void Enigma::printEnigmaStatus()
 {
-	std::cout << "Rotor information from left to right: \n\n";
+	std::cout << "Enigma Status: \nPlugboard: \n";
+	for(auto pair : plugboardSettings)
+	{
+		std::cout << pair << " ";
+	} 
+
+	std::cout << "\nRotor information from left to right: \n\n";
 
 	for(auto rotor : rotors)
 	{
 		rotor.printRotorStatus();
 	} 
 }
+
+
+
 
 void Enigma::setRotors(int r[3])
 {
@@ -75,12 +85,11 @@ std::string Enigma::transform(std::string& input)
 	{
 		rotateRotors();
 
-		//Through the rotors
 		char temp = std::toupper(c);
 
-		//temp = rotors.at(0).getTransformedChar(temp);
-	
-		
+		temp = charThroughPlugboard(temp);
+
+		//Through the rotors
 		for(auto it = rotors.rbegin(); it != rotors.rend(); it++)
 		{
 			temp = it->getTransformedChar(temp);
@@ -93,13 +102,23 @@ std::string Enigma::transform(std::string& input)
 		{
 			temp = it->getInverseTransformedChar(temp);
 		}
-		
 
-		//temp = rotors.at(0).getInverseTransformedChar(temp);
+		temp = charThroughPlugboard(temp);
+
 		//std::cout << "Input: " << c << " became: " << temp << "\n";
 		output += temp;
 	}
 	return output;
+}
+
+char Enigma::charThroughPlugboard(char c)
+{
+	for(auto pair : plugboardSettings)
+	{
+		if(pair.front() == c) return pair.back();
+		if(pair.back() == c) return pair.front();
+	}
+	return c;
 }
 
 
