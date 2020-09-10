@@ -6,11 +6,21 @@ Rotor::Rotor()
 
 }
 
-Rotor::Rotor(std::string _alphabet)
+Rotor::Rotor(int _id, char _pos)
 {
-	alphabet = _alphabet;
+	rotorId = _id;
+	rotorPosition = _pos;
+	if(_pos == 'r')
+	{
+		alphabet = reflectorAlphabets[_id];
+	}
+	else
+	{
+		alphabet = rotorAlphabets[_id];
+	}
 	ringSetting = 0;
 	offset = 0;
+	steppingPoint = charToAlphabetIndex(stepPoints[_id]);
 }
 
 Rotor::~Rotor()
@@ -78,8 +88,12 @@ void Rotor::setRingSetting(int i)
 
 bool Rotor::incrementOffset()
 {
-	offset++;
-
+	offset = modulo(offset + 1, alphabet.size());
+	if(offset == steppingPoint) 
+	{
+		std::cout << "Rotor at stepPoint: " << steppingPoint << "\n";
+		return true;
+	}
 	return false;
 }
 
@@ -97,4 +111,13 @@ int Rotor::charToAlphabetIndex(char c)
 {
 	int i = (int)c - asciiOffset;
 	return i;
+}
+
+void Rotor::printRotorStatus()
+{
+	std::cout << "\tRotorID: " << rotorId << "\n";
+	std::cout << "\t\tStepping point: " << steppingPoint << "\n";
+	std::cout << "\t\tCurrent offset: " << offset << "\n";
+	std::cout << "\t\tCurrent RingSetting: " << ringSetting << "\n";
+	std::cout << "\t\tAlhpabet: " << alphabet << "\n\n\n";
 }

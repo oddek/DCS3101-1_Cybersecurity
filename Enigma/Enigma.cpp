@@ -1,7 +1,13 @@
 #include "Enigma.h"
 
-Enigma::Enigma(): reflector(reflectorAlphabets[1])
+Enigma::Enigma(int rotorIds[3], int reflectorId): reflector(reflectorId, 'r')
 {
+	Rotor rotor1(rotorIds[0], 'L');
+	Rotor rotor2(rotorIds[1], 'M');
+	Rotor rotor3(rotorIds[2], 'R');
+	rotors.push_back(rotor1);
+	rotors.push_back(rotor2);
+	rotors.push_back(rotor3);
 }
 
 Enigma::~Enigma()
@@ -9,11 +15,25 @@ Enigma::~Enigma()
 
 }
 
+void Enigma::printRotorStatus()
+{
+	std::cout << "Rotor information from left to right: \n\n";
+
+	for(auto rotor : rotors)
+	{
+		rotor.printRotorStatus();
+	} 
+}
+
 void Enigma::setRotors(int r[3])
 {
+
 	for(int i = 0; i <= 2; i++)
 	{
-		rotors.push_back(Rotor(rotorAlphabets[r[i]]));
+		Rotor rotor(r[i], r[i]);
+		//rotor.setSteppingPoint(stepPoints[i])
+		rotors.push_back(rotor);
+		
 	}
 }
 
@@ -36,13 +56,16 @@ void Enigma::setRingSetting(int s[3])
 }
 
 void Enigma::rotateRotors()
-{
+{	
 	for(auto it = rotors.rbegin(); it != rotors.rend(); it++)
 	{
 		bool next = it->incrementOffset();
 		if(!next) break;
-	}		
+	}	
+	printRotorStatus();
+	
 }
+
 
 std::string Enigma::transform(std::string& input)
 {
@@ -73,7 +96,7 @@ std::string Enigma::transform(std::string& input)
 		
 
 		//temp = rotors.at(0).getInverseTransformedChar(temp);
-
+		std::cout << "Input: " << c << " became: " << temp << "\n";
 		output += temp;
 	}
 	return output;

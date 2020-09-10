@@ -7,36 +7,20 @@
 #include <algorithm>
 
 
-static const std::string rotorAlphabets[9] = 
-	{
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-		"EKMFLGDQVZNTOWYHXUSPAIBRCJ",
-		"AJDKSIRUXBLHWTMCQGZNPYFVOE",
-		"BDFHJLCPRTXVZNYEIWGAKMUSQO",
-		"ESOVPZJAYQUIRHXLNFTGKDCMWB",
-		"VZBRGITYUPSDNHLXAWMJQOFECK",
-		"JPGVOUMFYQBENHZRDKASXLICTW",
-		"NZJHGRCXMYSWBOUFAIVLPEKQDT",
-		"FKQHTLXOCBJSPDZRAMEWNIUYGV"
-	};
 
-static const std::string reflectorAlphabets[3] = 
-	{
-		"EJMZALYXVBWFCRQUONTSPIKHGD",
-		"YRUHQSLDPXNGOKMIEBFZCWVJAT",
-		"FVPJIAOYEDRZXWGCTKUQSBNMHL"
-	};
+
 
 class Enigma
 {
 public:
-	Enigma();
+	Enigma(int rotorIds[3], int reflectorId);
 	~Enigma();
 	void setRotors(int r[3]);
 	void setOffset(int o[3]);
 	void setRingSetting(int s[3]);
 	std::string transform(std::string& input);
 
+	void printRotorStatus();
 
 
 private:
