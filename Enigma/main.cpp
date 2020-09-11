@@ -9,7 +9,6 @@ bool fullTest1();
 bool fullTest2();
 bool fullTest3();
 
-
 int main(int argc, const char* argv[])
 {
 	bool test = true;
@@ -111,19 +110,6 @@ bool fullTest1()
 		}
 }
 
-bool test(int rotorIds[], int reflektorId, int offset[], int ringSetting[], std::vector<std::string> plugboardSettings, std::string& input, std::string& solution)
-{
-	//Setup enigma
-		Enigma enigma(rotorIds, reflektorId, plugboardSettings);
-		enigma.setOffset(offset);
-		enigma.setRingSetting(ringSetting);
-
-	//Test
-		std::string encrypted = enigma.transform(input);
-		std::transform(solution.begin(), solution.end(), solution.begin(), ::toupper);
-		return formatString(encrypted).compare(solution) == 0;
-}
-
 bool fullTest2()
 {
 	//Setup test parameters
@@ -184,4 +170,17 @@ bool fullTest3()
 			std::cout << "Test3: Failed\n";
 			return false;
 		}
+}
+
+bool test(int rotorIds[], int reflektorId, int offset[], int ringSetting[], std::vector<std::string> plugboardSettings, std::string& input, std::string& solution)
+{
+	//Setup enigma
+		Enigma enigma(rotorIds, reflektorId, plugboardSettings);
+		enigma.setOffset(offset);
+		enigma.setRingSetting(ringSetting);
+
+	//Test
+		std::string encrypted = enigma.transform(input);
+		std::transform(solution.begin(), solution.end(), solution.begin(), ::toupper);
+		return formatString(encrypted).compare(solution) == 0;
 }
