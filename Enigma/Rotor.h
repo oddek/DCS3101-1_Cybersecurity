@@ -21,6 +21,7 @@ private:
 	int ringSetting;
 	int offset;
 	int steppingPoint;
+	int steppingPoint2 = -1;
 	char intToAsciiChar(int i);
 	int rotorId = 0;
 	char rotorPosition;
@@ -44,15 +45,15 @@ static const std::string rotorAlphabets[9] =
 	"FKQHTLXOCBJSPDZRAMEWNIUYGV"
 };
 //Rotors will step the next, when stepping to these characters
-static const char stepPoints[] = 
+static const std::string stepPoints[] = 
 {
-	'0', //Dummy stepper
-	'R',
-	'F',
-	'W',
-	'K',
-	'A',
-	'A' //Have to add another stepping point at 'N' for this
+	"0", //Dummy stepper
+	"R",
+	"F",
+	"W",
+	"K",
+	"A",
+	"AN" //Have to add another stepping point at 'N' for this
 };
 
 static const std::string reflectorAlphabets[] = 

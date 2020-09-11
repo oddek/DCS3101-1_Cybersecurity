@@ -21,7 +21,16 @@ Rotor::Rotor(int _id, char _pos)
 	}
 	ringSetting = 0;
 	offset = 0;
-	steppingPoint = charToAlphabetIndex(stepPoints[_id]);
+	
+	if(_id == 6 || _id == 7 || _id == 8)
+	{
+		steppingPoint = charToAlphabetIndex(stepPoints[6].at(0));
+		steppingPoint2 = charToAlphabetIndex(stepPoints[6].at(1));
+	}
+	else
+	{
+		steppingPoint = charToAlphabetIndex(stepPoints[_id].at(0));
+	}
 }
 
 Rotor::~Rotor()
@@ -90,8 +99,9 @@ bool Rotor::incrementOffset(bool doubleStep)
 {
 	offset = modulo(offset + 1, alphabet.size());
 	//If this is the rightmost rotor, and the middle rotor is in doublestep position, we also have to return true;
-	if(offset == steppingPoint || rotorPosition == 'R' && doubleStep) 
+	if((offset == steppingPoint || offset == steppingPoint2) || rotorPosition == 'R' && doubleStep) 
 	{
+		//std::cout << "rotor " << rotorPosition << " returning true, on offset " << offset << "\n";
 		return true;
 	}
 	return false;
@@ -125,6 +135,7 @@ void Rotor::printRotorStatus()
 		std::cout << "\t" << rotorPosition << "-rotor\n";
 		std::cout << "\t\tRotorId: " << rotorId << "\n";
 		std::cout << "\t\tStepping point: " << steppingPoint << "\n";
+		if(steppingPoint2 != -1) std::cout << "\t\tStepping point2: " << steppingPoint2 << "\n";
 		std::cout << "\t\tCurrent offset:" << offset << "\n";
 		std::cout << "\t\tCurrent RingSetting: " << ringSetting << "\n";
 		std::cout << "\t\tAlphabet: " << alphabet << "\n\n\n";
@@ -133,5 +144,7 @@ void Rotor::printRotorStatus()
 //If the middle rotor is at the position before it is supposed to step the next, it shall just step to the next;
 bool Rotor::isDoubleStep()
 {
-	return rotorPosition == 'M' && offset == steppingPoint - 1;
+	bool ret = (rotorPosition == 'M' && (offset == modulo(steppingPoint - 1, alphabet.size()) || (steppingPoint2 != -1 && offset == modulo(steppingPoint2 -1, alphabet.size()))));
+	//if(ret) std::cout << "DoubleStep = True on offset: " << offset << "\n";
+	return ret;
 }
