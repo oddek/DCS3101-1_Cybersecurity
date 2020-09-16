@@ -34,5 +34,5 @@ procedure main is
 
 	end extended_gcd;
 begin
-	extended_gcd(34,55);
+	extended_gcd(42, 7);
 end main;
