@@ -46,15 +46,26 @@ std::vector<std::vector<int>> INV_S_BOX =
     {0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d}
 };
 
+std::vector<std::vector<int>> MIX_COL_MATRIX = 
+{
+	{2, 3, 1, 1},
+	{1, 2, 3, 1},
+	{1, 1, 2, 3},
+	{3, 1, 1, 2}
+};
+
 
 void printGrid(const std::vector<std::vector<std::bitset<8>>>& grid);
 std::bitset<8> sBox(std::bitset<8> byte);
+std::vector<std::vector<std::bitset<8>>> generateKey();
 
 std::vector<std::vector<std::bitset<8>>> generateGrid(std::string message);
 void substitute(std::vector<std::vector<std::bitset<8>>>& grid);
 void invSubstitute(std::vector<std::vector<std::bitset<8>>>& grid);
 void shiftGrid(std::vector<std::vector<std::bitset<8>>>& grid);
 void InvShiftGrid(std::vector<std::vector<std::bitset<8>>>& grid);
+std::bitset<8> ffMultiply(std::bitset<8> a, std::bitset<8> b);
+void mixColumns(std::vector<std::vector<std::bitset<8>>>& grid);
 
 
 int main()
@@ -63,18 +74,25 @@ int main()
 	std::string message = "katthundfisklakskentoddeengaarne";
 
 	auto grid = generateGrid(message);
-
+	auto key = generateKey();
+	std::cout << "Key:\n";
+	printGrid(key);
 	
-
+	std::cout << "Original Grid:\n";
 	printGrid(grid);
 
-	substitute(grid);
+	mixColumns(grid);
+
+	/*substitute(grid);
+	std::cout << "After Sub:\n";
 	printGrid(grid);
+
 	shiftGrid(grid);
+	std::cout << "After Shift:\n";
 	printGrid(grid);
 	InvShiftGrid(grid);
 	invSubstitute(grid);
-
+*/
 
 	printGrid(grid);
 
@@ -82,6 +100,66 @@ int main()
 	return 0;
 }
 
+void mixColumns(std::vector<std::vector<std::bitset<8>>>& grid)
+{
+	std::vector<std::vector<std::bitset<8>>> newGrid(4, std::vector<std::bitset<8>>(4));
+
+	for(int row = 0; row < N; row++)
+	{
+		for(int col = 0; col < N; col++)
+		{
+			std::vector<std::bitset<8>> c;
+
+			for(int tempRow = 0; tempRow < N; tempRow++)
+			{
+				c.push_back(ffMultiply(grid.at(tempRow).at(col), MIX_COL_MATRIX.at(row).at(tempRow)));
+			}
+			std::bitset<8> final;
+			for(auto i : c) final ^= i;
+			newGrid.at(row).at(col) = final;
+
+		}
+	}
+	grid = newGrid;
+}
+
+
+std::bitset<8> ffMultiply(std::bitset<8> a, std::bitset<8> b)
+{
+	//std::cout << "Multi " << std::hex << a.to_ulong() << ", with " << std::hex << b.to_ulong() << "\n";
+	if(b.to_ulong() == 0x01)
+	{
+		
+		return a;
+	} 
+ 	std::bitset<8> magicByte(std::string("00011011"));
+
+	std::bitset<8> c = a << 1;
+	if(a[a.size() - 1])
+	{
+		c ^= magicByte;
+	}
+
+	if(b.to_ulong() == 0x03)
+	{
+		c ^= a;
+	}
+	return c;
+}
+
+std::vector<std::vector<std::bitset<8>>> generateKey()
+{
+	std::vector<std::vector<std::bitset<8>>> grid(4, std::vector<std::bitset<8>>(4));
+
+	for(int i = 0; i < N; i++)
+	{
+		for(int j = 0; j < N; j++)
+		{
+			grid.at(i).at(j) = std::bitset<8>(rand() % 256);
+		}
+	}
+	return grid;
+}
 
 std::bitset<8> sBox(std::bitset<8> byte)
 {
@@ -105,6 +183,7 @@ void printGrid(const std::vector<std::vector<std::bitset<8>>>& grid)
 {
 	for(auto v : grid)
 	{
+		std::cout << "\t";
 		for(auto b : v)
 		{
 			std::cout << std::hex << b.to_ulong() << " ";
@@ -157,7 +236,7 @@ void invSubstitute(std::vector<std::vector<std::bitset<8>>>& grid)
 
 std::vector<std::vector<std::bitset<8>>> generateGrid(std::string message)
 {
-	std::vector<std::vector<std::bitset<8>>> grid(4, std::vector<std::bitset<8>>(4));
+	/*std::vector<std::vector<std::bitset<8>>> grid(4, std::vector<std::bitset<8>>(4));
 
 	int index = 0;
 	for(int i = 0; i < N; i++)
@@ -168,6 +247,31 @@ std::vector<std::vector<std::bitset<8>>> generateGrid(std::string message)
 			index++;
 		}
 	}
+	return grid;*/
+
+	std::vector<std::vector<std::bitset<8>>> grid;
+
+	grid.push_back({std::bitset<8>(0xd4), 
+					std::bitset<8>(0xd4), 
+					std::bitset<8>(0xd4), 
+					std::bitset<8>(0xd4)});
+
+	grid.push_back({std::bitset<8>(0xbf), 
+					std::bitset<8>(0xbf), 
+					std::bitset<8>(0xbf), 
+					std::bitset<8>(0xbf)});
+
+	grid.push_back({std::bitset<8>(0x5d), 
+					std::bitset<8>(0x5d), 
+					std::bitset<8>(0x5d), 
+					std::bitset<8>(0x5d)});
+
+	grid.push_back({std::bitset<8>(0x30), 
+					std::bitset<8>(0x30), 
+					std::bitset<8>(0x30), 
+					std::bitset<8>(0x30)});
+
 	return grid;
+
 }
 
