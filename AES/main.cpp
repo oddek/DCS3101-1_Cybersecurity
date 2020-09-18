@@ -5,25 +5,11 @@
 #include <algorithm>
 
 int N = 4;
+int ROUNDS = 10;
 
-std::vector<std::vector<int>> RCON_BOX = 
+std::vector<int> RCON_BOX = 
 {
-	{0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a}, 
-	{0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39}, 
-	{0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a}, 
-	{0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8}, 
-	{0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef}, 
-	{0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc}, 
-	{0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b}, 
-	{0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3}, 
-	{0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94}, 
-	{0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20}, 
-	{0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35}, 
-	{0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f}, 
-	{0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04}, 
-	{0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63}, 
-	{0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd}, 
-	{0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb}
+	{0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36} 
 };
 
 std::vector<std::vector<int>> S_BOX = 
@@ -91,7 +77,9 @@ void addRoundKey(std::vector<std::vector<std::bitset<8>>>& grid, std::vector<std
 
 /*Key stuff*/
 std::vector<std::vector<std::bitset<8>>> generateKey();
-std::vector<std::vector<std::bitset<8>>> generateExpandedKey(std::vector<std::vector<std::bitset<8>>>& key);
+std::vector<std::vector<std::vector<std::bitset<8>>>> generateExpandedKey(std::vector<std::vector<std::bitset<8>>>& key);
+std::vector<std::vector<std::bitset<8>>> generateRoundKey(std::vector<std::vector<std::bitset<8>>>& prevKey, int roundNumber);
+void printExpandedKey(std::vector<std::vector<std::vector<std::bitset<8>>>>& key);
 void rotateKey(std::vector<std::bitset<8>>& word);
 std::bitset<8> rcon(std::bitset<8> byte);
 int keyN = 16;
@@ -111,8 +99,8 @@ int main()
 	std::cout << "Key:\n";
 	printGrid(key);
 	auto expandedKey = generateExpandedKey(key);
-	std::cout << "Expanded Key:\n";
-	printGrid(expandedKey);
+	std::cout << "Round Key:\n";
+	printExpandedKey(expandedKey);
 	//std::cout << "Original Grid:\n";
 	//printGrid(grid);
 	//addRoundKey(grid, key);
@@ -136,7 +124,6 @@ int main()
 }
 
 /*KEY STUFF*/
-
 std::vector<std::vector<std::bitset<8>>> generateKey()
 {
 	std::vector<std::vector<std::bitset<8>>> grid(4, std::vector<std::bitset<8>>(4));
@@ -153,59 +140,69 @@ std::vector<std::vector<std::bitset<8>>> generateKey()
 	return grid;
 }
 
-generateRoundKey(std::vector<std::vector<std::bitset<8>>>& prevKey, int roundNumber)
+std::vector<std::vector<std::vector<std::bitset<8>>>> generateExpandedKey(std::vector<std::vector<std::bitset<8>>>& key)
 {
-	std::vector<std::vector<std::bitset<8>>> roundKey(4, std::vector<std::bitset<8>>(4))
-
-	std::vector<std::bitset<8>> word4;
-	for(int i = 0; i < N; i++)
-	{
-		word4.push_back(roundKey.at(i).at(N-1));
-	}
-}
-
-
-std::vector<std::vector<std::bitset<8>>> generateExpandedKey(std::vector<std::vector<std::bitset<8>>>& key)
-{
-	std::vector<std::vector<std::bitset<8>>> expandedKey(11, std::vector<std::bitset<8>>(16));
+	std::vector<std::vector<std::vector<std::bitset<8>>>> expandedKey;//ROUNDS - 1, std::vector<std::vector<std::bitset<8>>>(N, std::vector<std::bitset<8>>(N)));
 
 	//Add the key to the first row of expanded key:
-	int index = 0;
-	for(auto v : key)
+	expandedKey.push_back(key);
+	for(int i = 1; i <= ROUNDS; i++)
 	{
-		for(auto byte : v)
-		{
-			expandedKey.at(0).at(index) = byte;
-			index++;
-		}
-		
+		expandedKey.push_back(generateRoundKey(expandedKey.back(), i));
 	}
-
-
-
+	
 	return expandedKey;
 }
 
-
-void rotateKey(std::vector<std::bitset<8>>& word)
+std::vector<std::vector<std::bitset<8>>> generateRoundKey(std::vector<std::vector<std::bitset<8>>>& prevKey, int roundNumber)
 {
-	std::rotate(word.begin(), word.begin() + 1, word.end());
+	std::vector<std::vector<std::bitset<8>>> roundKey(4, std::vector<std::bitset<8>>(4));
+	//Create and fill G with rightmost col from prevKey
+	std::vector<std::bitset<8>> G;
+	for(int i = 0; i < N; i++)
+	{
+		G.push_back(prevKey.at(i).at(N-1));
+	}
+
+	//for(auto& byte : G) std::cout << std::hex << byte.to_ulong();
+	//std::cout << "\n";
+	//shift rotate G, on to the left
+	std::rotate(G.begin(), G.begin()+1, G.end());
+
+	//Push G through S_Box
+	for(auto& byte : G)
+	{
+		byte = sBox(byte);
+	}
+
+	//XOr first byte of G with roundnumber
+	G.at(0) ^= std::bitset<8>(RCON_BOX.at(roundNumber));
+
+	//First word of roundKey is first word of prevKey XORed with G
+	for(int i = 0; i < N; i++)
+	{
+		roundKey.at(i).at(0) = prevKey.at(i).at(0) ^ G.at(i);
+	}
+	for(int j = 1; j < N; j++)
+	{
+		for(int i = 0; i < N; i++)
+		{
+			roundKey.at(i).at(j) = prevKey.at(i).at(j) ^ roundKey.at(i).at(j-1);
+		}	
+	}
+	return roundKey;
 }
 
-std::bitset<8> rcon(std::bitset<8> byte)
+void printExpandedKey(std::vector<std::vector<std::vector<std::bitset<8>>>>& key)
 {
-	std::bitset<8> divider(0x0F);
-	unsigned col = std::bitset<4>((byte & divider).to_ulong()).to_ulong();
-	unsigned row = std::bitset<4>(((byte >> 4) & divider).to_ulong()).to_ulong();
-
-	return std::bitset<8>(RCON_BOX.at(row).at(col));
+	for(const auto& grid : key)
+	{
+		printGrid(grid);
+	}
 }
-
-
 
 
 /*NORMAL STUFF*/
-
 void addRoundKey(std::vector<std::vector<std::bitset<8>>>& grid, std::vector<std::vector<std::bitset<8>>>& key)
 {
 	for(int row = 0; row < N; row++)
@@ -216,7 +213,6 @@ void addRoundKey(std::vector<std::vector<std::bitset<8>>>& grid, std::vector<std
 		}
 	}
 }
-
 
 void mixColumns(std::vector<std::vector<std::bitset<8>>>& grid)
 {
