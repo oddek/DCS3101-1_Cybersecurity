@@ -148,39 +148,6 @@ std::string decrypt128BitMessage(std::vector<std::vector<std::bitset<8>>> grid, 
 
 int main()
 {
-
-
-	/*
-	std::string key = "2b28ab097eaef7cf15d2154f16a6883c";
-	std::string enc = "5a9bece90c6ababf667f2d07416f45a1";
-	auto g = generateGridFromHexString(enc);
-	auto k = generateGridFromHexString(key);
-	std::cout << "Key: \n\t" << key << "\n";
-	std::cout << "Trying to decrypt: \n\t" << enc << "\n";
-
-	std::string dec = decrypt128BitMessage(g, k);
-
-	std::string decPlain = hexStringToPlaintext(dec);
-
-	std::cout << "DecryptedMessage: \n\t" << dec << "\n";
-	std::cout << "DecryptedPlaintext: \n\t" << decPlain << "\n";
-
-
-	g = generateGridFromHexString(dec);
-	std::string encryptedAgain = encrypt128BitMessage(g, k);
-
-	std::cout << "EncryptedBack: \n\t" << encryptedAgain << "\n";
-
-*/
-	/*std::string p = "046681E5046681E5046681E5046681E5";
-	auto g = generateGridFromHexString(p);
-	printGrid(g);
-	invMixColumns(g);
-	printGrid(g);
-*/
-
-
-
 	bool test = true;
 	bool randomKey = false;
 
@@ -460,8 +427,15 @@ void invMixColumns(std::vector<std::vector<std::bitset<8>>>& grid)
 
 			for(int tempRow = 0; tempRow < N; tempRow++)
 			{
-				unsigned long t1 = L(grid.at(tempRow).at(col)).to_ulong();
-				unsigned long t2 = L(INV_MIX_COL_MATRIX.at(row).at(tempRow)).to_ulong();
+				auto b1 = grid.at(tempRow).at(col);
+				auto b2 = INV_MIX_COL_MATRIX.at(row).at(tempRow);
+				if(b1.none()) 
+				{
+					c.push_back(b1);
+					continue;
+				}
+				unsigned long t1 = L(b1).to_ulong();
+				unsigned long t2 = L(b2).to_ulong();
 				unsigned long t3 = t1 + t2;
 				if(t3 > 0xFF) t3 -= 0xFF;
 
