@@ -157,7 +157,7 @@ int main()
 		return 0;
 	}
 
-	std::string plaintext = 	"katthundfisklaks";
+	std::string plaintext = 	"Dette er en melding som jeg ikke vet";
 	std::string keyString = 	"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 	auto key = generateGridFromHexString(keyString);
 
@@ -662,7 +662,7 @@ void runTests()
 
 	encrypted = encrypt128BitMessage(grid, key);
 
-	std::cout << "\tTest 2: \n";
+	std::cout << "\tTest 3: \n";
 	std::cout << "\t\tEncryption: ";
 
 	if(cipherText.compare(encrypted) == 0)
