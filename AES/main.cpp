@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 
 int N = 4;
 int ROUNDS = 10;
@@ -88,9 +89,9 @@ void printGrid(const std::vector<std::vector<std::bitset<8>>>& grid);
 void printExpandedKey(std::vector<std::vector<std::vector<std::bitset<8>>>>& key);
 std::vector<std::vector<std::bitset<8>>> generateGridFromPlainText(std::string message);
 std::vector<std::vector<std::bitset<8>>> generateGridFromHexString(std::string s);
-std::string gridToString(std::vector<std::vector<std::bitset<8>>> grid);
+std::string gridToHexString(std::vector<std::vector<std::bitset<8>>> grid);
 
-void test();
+void runTests();
 
 //Interface
 std::string encrypt128BitMessage(std::vector<std::vector<std::bitset<8>>> grid, std::vector<std::vector<std::bitset<8>>>& key);
@@ -102,29 +103,30 @@ std::string encrypt128BitMessage(std::vector<std::vector<std::bitset<8>>> grid, 
 
 int main()
 {
-	
+	bool test = true;
+	bool randomKey = false;
 
+	if(test) 
+	{
+		runTests();
+		return 0;
+	}
 
-	std::string plaintext = 	"6a84867cd77e12ad07ea1be895c53fa3";
-	std::string keyString = 	"00000000000000000000000000000000";
-	std::string cipherText = 	"732281c0a0aab8f7a54a0c67a0c45ecf";
-
-
-	auto grid = generateGridFromHexString(plaintext);
+	std::string plaintext = 	"katthundfisklakskentoddeheterjeg";
+	std::string keyString = 	"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 	auto key = generateGridFromHexString(keyString);
-	auto cipher = generateGridFromHexString(cipherText);
 
+	auto grid = generateGridFromPlainText(plaintext);
+	if(randomKey)
+	{
+		key = generateKey();
+	}
+	std::cout << "Plaintext:\n\t" << plaintext << "\n";
+	std::cout << "Plaintext in hex: \n\t" << gridToHexString(grid) << "\n";
+	std::cout << "Key: \n\t" << keyString << "\n";
 
-	/*std::string message = "katthundfisklaks";//kentoddeengaarne";
-
-	auto grid = generateGrid(message);
-	auto key = generateKey();
-	*/std::cout << "Message as grid:\n";
-	printGrid(grid);
-	std::cout << "Key:\n";
-	printGrid(key);
 	std::string encrypted = encrypt128BitMessage(grid, key);
-	std::cout << "EncryptedMessage: \n" << encrypted;
+	std::cout << "EncryptedMessage: \n\t" << encrypted;
 	return 0;
 }
 
@@ -163,30 +165,28 @@ std::string encrypt128BitMessage(std::vector<std::vector<std::bitset<8>>> grid, 
 		mixColumns(grid);
 		addRoundKey(grid, expandedKey.at(i));
 	}
-
+	//Final Round:
 	substitute(grid);
 	shiftGrid(grid);
-	addRoundKey(grid, expandedKey.at(10));
+	addRoundKey(grid, expandedKey.at(ROUNDS));
 
-
-
-	std::cout << "EncryptedGRID: \n";
-	printGrid(grid);
-	return gridToString(grid);
+	return gridToHexString(grid);
 }
 
-std::string gridToString(std::vector<std::vector<std::bitset<8>>> grid)
+std::string gridToHexString(std::vector<std::vector<std::bitset<8>>> grid)
 {
-	std::string s = "";
+	std::stringstream stream;
 	for(int i = 0; i < N; i++)
 	{
 		for(int j = 0; j < N; j++)
 		{
-			unsigned long n = grid.at(j).at(i).to_ulong();
-			s += static_cast<unsigned char>(n);
+			unsigned long num = grid.at(j).at(i).to_ulong();
+			if(num < 16) stream << 0;
+			stream << std::hex << num;
 		}
 	}
-	return s;
+	std::string res(stream.str());
+	return res;
 }
 
 
@@ -201,8 +201,8 @@ std::vector<std::vector<std::bitset<8>>> generateKey()
 	{
 		for(int j = 0; j < N; j++)
 		{
-			//grid.at(i).at(j) = std::bitset<8>(rand() % 256);
-			grid.at(i).at(j) = std::bitset<8>(0xFF);
+			grid.at(i).at(j) = std::bitset<8>(rand() % 256);
+			//grid.at(i).at(j) = std::bitset<8>(0xFF);
 
 		}
 	}
@@ -405,7 +405,7 @@ void invSubstitute(std::vector<std::vector<std::bitset<8>>>& grid)
 	}
 }
 
-std::vector<std::vector<std::bitset<8>>> generateGrid(std::string message)
+std::vector<std::vector<std::bitset<8>>> generateGridFromPlainText(std::string message)
 {
 	std::vector<std::vector<std::bitset<8>>> grid(4, std::vector<std::bitset<8>>(4));
 
@@ -422,100 +422,89 @@ std::vector<std::vector<std::bitset<8>>> generateGrid(std::string message)
 }
 
 
-
-void test()
+/*
+	Test vectors collected from: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf
+	PAGE 24
+*/
+void runTests()
 {
 
+	std::cout << "Running tests:\n";
 
+	std::string plaintext = 	"6bc1bee22e409f96e93d7e117393172a";
+	std::string keyString = 	"2b7e151628aed2a6abf7158809cf4f3c";
+	std::string cipherText = 	"3ad77bb40d7a3660a89ecaf32466ef97";
+	auto grid = generateGridFromHexString(plaintext);
+	auto key = generateGridFromHexString(keyString);
+	auto cipher = generateGridFromHexString(cipherText);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-	std::vector<std::vector<std::bitset<8>>> grid;
-
-	grid.push_back({std::bitset<8>(0x32), 
-					std::bitset<8>(0x88), 
-					std::bitset<8>(0x31), 
-					std::bitset<8>(0xe0)});
-	grid.push_back({std::bitset<8>(0x43), 
-					std::bitset<8>(0x5a), 
-					std::bitset<8>(0x31), 
-					std::bitset<8>(0x37)});
-	grid.push_back({std::bitset<8>(0xf6), 
-					std::bitset<8>(0x30), 
-					std::bitset<8>(0x98), 
-					std::bitset<8>(0x07)});
-	grid.push_back({std::bitset<8>(0xa8), 
-					std::bitset<8>(0x8d), 
-					std::bitset<8>(0xa2), 
-					std::bitset<8>(0x34)});
-
-	std::vector<std::vector<std::bitset<8>>> key;
-
-	key.push_back({std::bitset<8>(0x2b), 
-					std::bitset<8>(0x28), 
-					std::bitset<8>(0xab), 
-					std::bitset<8>(0x09)});
-	key.push_back({std::bitset<8>(0x7e), 
-					std::bitset<8>(0xae), 
-					std::bitset<8>(0xf7), 
-					std::bitset<8>(0xcf)});
-	key.push_back({std::bitset<8>(0x15), 
-					std::bitset<8>(0xd2), 
-					std::bitset<8>(0x15), 
-					std::bitset<8>(0x4f)});
-	key.push_back({std::bitset<8>(0x16), 
-					std::bitset<8>(0xa6), 
-					std::bitset<8>(0x88), 
-					std::bitset<8>(0x3c)});
-
-	std::vector<std::vector<std::bitset<8>>> sol;
-
-	sol.push_back({std::bitset<8>(0x39), 
-					std::bitset<8>(0x02), 
-					std::bitset<8>(0xdc), 
-					std::bitset<8>(0x19)});
-	sol.push_back({std::bitset<8>(0x25), 
-					std::bitset<8>(0xdc), 
-					std::bitset<8>(0x11), 
-					std::bitset<8>(0x61)});
-	sol.push_back({std::bitset<8>(0x84), 
-					std::bitset<8>(0x09), 
-					std::bitset<8>(0x85), 
-					std::bitset<8>(0x0b)});
-	sol.push_back({std::bitset<8>(0x1d), 
-					std::bitset<8>(0xfb), 
-					std::bitset<8>(0x97), 
-					std::bitset<8>(0x32)});
-
-
-	std::cout << "Running test: ";
-
-	/*std::cout << "Plaintext as grid:\n";
-	printGrid(grid);
-	std::cout << "Key as grid:\n";
-	printGrid(key);
 	std::string encrypted = encrypt128BitMessage(grid, key);
-
-	std::cout << "Solution as grid: \n";
-	printGrid(sol);
-	for(int i = 0; i < N; i++)
+	std::cout << "\tTest 1: ";
+	if(cipherText.compare(encrypted) == 0)
 	{
-		for(int j = 0; j < N; j++)
-		{
-			if()
-		}
+		std::cout << "Passed\n";
 	}
-	return 0;*/
+	else
+	{
+		std::cout << "Failed\n";
+	}
+
+	plaintext = 	"ae2d8a571e03ac9c9eb76fac45af8e51";
+	keyString = 	"2b7e151628aed2a6abf7158809cf4f3c";
+	cipherText = 	"f5d3d58503b9699de785895a96fdbaaf";
+	grid = generateGridFromHexString(plaintext);
+	key = generateGridFromHexString(keyString);
+	cipher = generateGridFromHexString(cipherText);
+
+	encrypted = encrypt128BitMessage(grid, key);
+
+	std::cout << "\tTest 2: ";
+	if(cipherText.compare(encrypted) == 0)
+	{
+		std::cout << "Passed\n";
+	}
+	else
+	{
+		std::cout << "Failed\n";
+	}
+
+	plaintext = 	"30c81c46a35ce411e5fbc1191a0a52ef";
+	keyString = 	"2b7e151628aed2a6abf7158809cf4f3c";
+	cipherText = 	"43b1cd7f598ece23881b00e3ed030688";
+	grid = generateGridFromHexString(plaintext);
+	key = generateGridFromHexString(keyString);
+	cipher = generateGridFromHexString(cipherText);
+
+	encrypted = encrypt128BitMessage(grid, key);
+
+	std::cout << "\tTest 2: ";
+	if(cipherText.compare(encrypted) == 0)
+	{
+		std::cout << "Passed\n";
+	}
+	else
+	{
+		std::cout << "Failed\n";
+	}
+
+	plaintext = 	"f69f2445df4f9b17ad2b417be66c3710";
+	keyString = 	"2b7e151628aed2a6abf7158809cf4f3c";
+	cipherText = 	"7b0c785e27e8ad3f8223207104725dd4";
+	grid = generateGridFromHexString(plaintext);
+	key = generateGridFromHexString(keyString);
+	cipher = generateGridFromHexString(cipherText);
+
+	encrypted = encrypt128BitMessage(grid, key);
+
+	std::cout << "\tTest 4: ";
+	if(cipherText.compare(encrypted) == 0)
+	{
+		std::cout << "Passed\n";
+	}
+	else
+	{
+		std::cout << "Failed\n";
+	}
+
 }
 
