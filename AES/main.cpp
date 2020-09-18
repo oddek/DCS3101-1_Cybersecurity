@@ -61,29 +61,41 @@ std::vector<std::vector<int>> MIX_COL_MATRIX =
 };
 
 
-void printGrid(const std::vector<std::vector<std::bitset<8>>>& grid);
-std::bitset<8> sBox(std::bitset<8> byte);
-
-
-std::vector<std::vector<std::bitset<8>>> generateGrid(std::string message);
-void substitute(std::vector<std::vector<std::bitset<8>>>& grid);
-void invSubstitute(std::vector<std::vector<std::bitset<8>>>& grid);
-void shiftGrid(std::vector<std::vector<std::bitset<8>>>& grid);
-void InvShiftGrid(std::vector<std::vector<std::bitset<8>>>& grid);
-std::bitset<8> ffMultiply(std::bitset<8> a, std::bitset<8> b);
-void mixColumns(std::vector<std::vector<std::bitset<8>>>& grid);
+//Operations:
 void addRoundKey(std::vector<std::vector<std::bitset<8>>>& grid, std::vector<std::vector<std::bitset<8>>>& key);
+void substitute(std::vector<std::vector<std::bitset<8>>>& grid);
+void shiftGrid(std::vector<std::vector<std::bitset<8>>>& grid);
+void mixColumns(std::vector<std::vector<std::bitset<8>>>& grid);
 
+//Inverse Operations:
 
-/*Key stuff*/
+void invSubstitute(std::vector<std::vector<std::bitset<8>>>& grid);
+void InvShiftGrid(std::vector<std::vector<std::bitset<8>>>& grid);
+
+//Key
 std::vector<std::vector<std::bitset<8>>> generateKey();
 std::vector<std::vector<std::vector<std::bitset<8>>>> generateExpandedKey(std::vector<std::vector<std::bitset<8>>>& key);
 std::vector<std::vector<std::bitset<8>>> generateRoundKey(std::vector<std::vector<std::bitset<8>>>& prevKey, int roundNumber);
+
+
+//Helpers
+std::bitset<8> sBox(std::bitset<8> byte);
+std::bitset<8> ffMultiply(std::bitset<8> a, std::bitset<8> b);
+
+
+//Meta
+void printGrid(const std::vector<std::vector<std::bitset<8>>>& grid);
 void printExpandedKey(std::vector<std::vector<std::vector<std::bitset<8>>>>& key);
-void rotateKey(std::vector<std::bitset<8>>& word);
-std::bitset<8> rcon(std::bitset<8> byte);
-int keyN = 16;
-int keyB = 176;
+std::vector<std::vector<std::bitset<8>>> generateGridFromPlainText(std::string message);
+std::vector<std::vector<std::bitset<8>>> generateGridFromHexString(std::string s);
+std::string gridToString(std::vector<std::vector<std::bitset<8>>> grid);
+
+void test();
+
+//Interface
+std::string encrypt128BitMessage(std::vector<std::vector<std::bitset<8>>> grid, std::vector<std::vector<std::bitset<8>>>& key);
+
+
 
 
 
@@ -92,36 +104,93 @@ int main()
 {
 	
 
-	std::string message = "katthundfisklakskentoddeengaarne";
+
+	std::string plaintext = 	"6a84867cd77e12ad07ea1be895c53fa3";
+	std::string keyString = 	"00000000000000000000000000000000";
+	std::string cipherText = 	"732281c0a0aab8f7a54a0c67a0c45ecf";
+
+
+	auto grid = generateGridFromHexString(plaintext);
+	auto key = generateGridFromHexString(keyString);
+	auto cipher = generateGridFromHexString(cipherText);
+
+
+	/*std::string message = "katthundfisklaks";//kentoddeengaarne";
 
 	auto grid = generateGrid(message);
 	auto key = generateKey();
+	*/std::cout << "Message as grid:\n";
+	printGrid(grid);
 	std::cout << "Key:\n";
 	printGrid(key);
-	auto expandedKey = generateExpandedKey(key);
-	std::cout << "Round Key:\n";
-	printExpandedKey(expandedKey);
-	//std::cout << "Original Grid:\n";
-	//printGrid(grid);
-	//addRoundKey(grid, key);
-	//mixColumns(grid);
-
-	/*substitute(grid);
-	std::cout << "After Sub:\n";
-	printGrid(grid);
-
-	shiftGrid(grid);
-	std::cout << "After Shift:\n";
-	printGrid(grid);
-	InvShiftGrid(grid);
-	invSubstitute(grid);
-*/
-
-	//printGrid(grid);
-
-
+	std::string encrypted = encrypt128BitMessage(grid, key);
+	std::cout << "EncryptedMessage: \n" << encrypted;
 	return 0;
 }
+
+std::vector<std::vector<std::bitset<8>>> generateGridFromHexString(std::string s)
+{
+	std::vector<std::vector<std::bitset<8>>> grid(4, std::vector<std::bitset<8>>(4));
+
+	int index = 0;
+	for(int i = 0; i < N; i++)
+	{
+		for(int j = 0; j < N; j++)
+		{
+			grid.at(j).at(i) = std::bitset<8>(stoi(s.substr(index, 2), 0, 16));
+			index += 2;
+		}
+	}
+	return grid;
+}
+
+
+
+std::string encrypt128BitMessage(std::vector<std::vector<std::bitset<8>>> grid, std::vector<std::vector<std::bitset<8>>>& key)
+{
+
+	auto expandedKey = generateExpandedKey(key);
+	//std::cout << "ExpandedKey: \n";
+	//printExpandedKey(expandedKey);
+	//Initial Round: Add round key
+	addRoundKey(grid, expandedKey.at(0));
+
+	//Rounds 1 - 10:
+	for(int i = 1; i < ROUNDS; i++)
+	{
+		substitute(grid);
+		shiftGrid(grid);
+		mixColumns(grid);
+		addRoundKey(grid, expandedKey.at(i));
+	}
+
+	substitute(grid);
+	shiftGrid(grid);
+	addRoundKey(grid, expandedKey.at(10));
+
+
+
+	std::cout << "EncryptedGRID: \n";
+	printGrid(grid);
+	return gridToString(grid);
+}
+
+std::string gridToString(std::vector<std::vector<std::bitset<8>>> grid)
+{
+	std::string s = "";
+	for(int i = 0; i < N; i++)
+	{
+		for(int j = 0; j < N; j++)
+		{
+			unsigned long n = grid.at(j).at(i).to_ulong();
+			s += static_cast<unsigned char>(n);
+		}
+	}
+	return s;
+}
+
+
+
 
 /*KEY STUFF*/
 std::vector<std::vector<std::bitset<8>>> generateKey()
@@ -338,42 +407,115 @@ void invSubstitute(std::vector<std::vector<std::bitset<8>>>& grid)
 
 std::vector<std::vector<std::bitset<8>>> generateGrid(std::string message)
 {
-	/*std::vector<std::vector<std::bitset<8>>> grid(4, std::vector<std::bitset<8>>(4));
+	std::vector<std::vector<std::bitset<8>>> grid(4, std::vector<std::bitset<8>>(4));
 
 	int index = 0;
 	for(int i = 0; i < N; i++)
 	{
 		for(int j = 0; j < N; j++)
 		{
-			grid.at(i).at(j) = std::bitset<8>(message.at(index));
+			grid.at(j).at(i) = std::bitset<8>(message.at(index));
 			index++;
 		}
 	}
-	return grid;*/
+	return grid;
+}
+
+
+
+void test()
+{
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	std::vector<std::vector<std::bitset<8>>> grid;
 
-	grid.push_back({std::bitset<8>(0xd4), 
-					std::bitset<8>(0xd4), 
-					std::bitset<8>(0xd4), 
-					std::bitset<8>(0xd4)});
-
-	grid.push_back({std::bitset<8>(0xbf), 
-					std::bitset<8>(0xbf), 
-					std::bitset<8>(0xbf), 
-					std::bitset<8>(0xbf)});
-
-	grid.push_back({std::bitset<8>(0x5d), 
-					std::bitset<8>(0x5d), 
-					std::bitset<8>(0x5d), 
-					std::bitset<8>(0x5d)});
-
-	grid.push_back({std::bitset<8>(0x30), 
+	grid.push_back({std::bitset<8>(0x32), 
+					std::bitset<8>(0x88), 
+					std::bitset<8>(0x31), 
+					std::bitset<8>(0xe0)});
+	grid.push_back({std::bitset<8>(0x43), 
+					std::bitset<8>(0x5a), 
+					std::bitset<8>(0x31), 
+					std::bitset<8>(0x37)});
+	grid.push_back({std::bitset<8>(0xf6), 
 					std::bitset<8>(0x30), 
-					std::bitset<8>(0x30), 
-					std::bitset<8>(0x30)});
+					std::bitset<8>(0x98), 
+					std::bitset<8>(0x07)});
+	grid.push_back({std::bitset<8>(0xa8), 
+					std::bitset<8>(0x8d), 
+					std::bitset<8>(0xa2), 
+					std::bitset<8>(0x34)});
 
-	return grid;
+	std::vector<std::vector<std::bitset<8>>> key;
 
+	key.push_back({std::bitset<8>(0x2b), 
+					std::bitset<8>(0x28), 
+					std::bitset<8>(0xab), 
+					std::bitset<8>(0x09)});
+	key.push_back({std::bitset<8>(0x7e), 
+					std::bitset<8>(0xae), 
+					std::bitset<8>(0xf7), 
+					std::bitset<8>(0xcf)});
+	key.push_back({std::bitset<8>(0x15), 
+					std::bitset<8>(0xd2), 
+					std::bitset<8>(0x15), 
+					std::bitset<8>(0x4f)});
+	key.push_back({std::bitset<8>(0x16), 
+					std::bitset<8>(0xa6), 
+					std::bitset<8>(0x88), 
+					std::bitset<8>(0x3c)});
+
+	std::vector<std::vector<std::bitset<8>>> sol;
+
+	sol.push_back({std::bitset<8>(0x39), 
+					std::bitset<8>(0x02), 
+					std::bitset<8>(0xdc), 
+					std::bitset<8>(0x19)});
+	sol.push_back({std::bitset<8>(0x25), 
+					std::bitset<8>(0xdc), 
+					std::bitset<8>(0x11), 
+					std::bitset<8>(0x61)});
+	sol.push_back({std::bitset<8>(0x84), 
+					std::bitset<8>(0x09), 
+					std::bitset<8>(0x85), 
+					std::bitset<8>(0x0b)});
+	sol.push_back({std::bitset<8>(0x1d), 
+					std::bitset<8>(0xfb), 
+					std::bitset<8>(0x97), 
+					std::bitset<8>(0x32)});
+
+
+	std::cout << "Running test: ";
+
+	/*std::cout << "Plaintext as grid:\n";
+	printGrid(grid);
+	std::cout << "Key as grid:\n";
+	printGrid(key);
+	std::string encrypted = encrypt128BitMessage(grid, key);
+
+	std::cout << "Solution as grid: \n";
+	printGrid(sol);
+	for(int i = 0; i < N; i++)
+	{
+		for(int j = 0; j < N; j++)
+		{
+			if()
+		}
+	}
+	return 0;*/
 }
 
