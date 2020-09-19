@@ -138,13 +138,14 @@ void printExpandedKey(std::vector<std::vector<std::vector<std::bitset<8>>>>& key
 std::vector<std::vector<std::bitset<8>>> generateGridFromPlainText(std::string message);
 std::vector<std::vector<std::bitset<8>>> generateGridFromHexString(std::string s);
 std::string gridToHexString(std::vector<std::vector<std::bitset<8>>> grid);
+std::string plaintextToHexString(std::string plaintext);
 std::string hexStringToPlaintext(std::string s);
 
 void runTests();
 
 //Interface
-std::string encrypt128BitMessage(std::vector<std::vector<std::bitset<8>>> grid, std::vector<std::vector<std::bitset<8>>>& key);
-std::string decrypt128BitMessage(std::vector<std::vector<std::bitset<8>>> grid, std::vector<std::vector<std::bitset<8>>>& key);
+std::string encrypt128BitMessage(std::string plaintext, std::string key);
+std::string decrypt128BitMessage(std::string cipherText, std::string key);
 
 int main()
 {
@@ -157,31 +158,37 @@ int main()
 		return 0;
 	}
 
-	std::string plaintext = 	"Dette er en melding som jeg ikke vet";
-	std::string keyString = 	"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-	auto key = generateGridFromHexString(keyString);
+	std::string plaintext = 	"hundkattfisklaks";
 
-	auto grid = generateGridFromPlainText(plaintext);
-	if(randomKey)
-	{
-		key = generateKey();
-	}
+	std::string key = 	"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+	
 	std::cout << "Plaintext:\n\t" << plaintext << "\n";
-	std::cout << "Plaintext in hex: \n\t" << gridToHexString(grid) << "\n";
-	std::cout << "Key: \n\t" << keyString << "\n";
+	std::cout << "Plaintext in hex: \n\t" << plaintextToHexString(plaintext) << "\n";
+	std::cout << "Key: \n\t" << key << "\n";
 
-	std::string encrypted = encrypt128BitMessage(grid, key);
+	std::string encrypted = encrypt128BitMessage(plaintextToHexString(plaintext), key);
 	std::cout << "EncryptedMessage: \n\t" << encrypted << "\n";
 
-	auto grid2 = generateGridFromHexString(encrypted);
-
-	std::string decrypted = decrypt128BitMessage(grid2, key);
+	std::string decrypted = decrypt128BitMessage(encrypted, key);
 	std::cout << "DecryptedMessage: \n\t" << decrypted << "\n";
 
 	std::string decPlain = hexStringToPlaintext(decrypted);
 	std::cout << "DecryptedPlainText: \n\t" << decPlain << "\n";
 
 	return 0;
+}
+
+std::string plaintextToHexString(std::string plaintext)
+{
+	std::stringstream stream;
+	for(auto ch : plaintext)
+	{
+		unsigned long num = ch;
+		if(num < 16) stream << 0;
+		stream << std::hex << num;
+	}
+	std::string res(stream.str());
+	return res;
 }
 
 std::string hexStringToPlaintext(std::string s)
@@ -212,8 +219,12 @@ std::vector<std::vector<std::bitset<8>>> generateGridFromHexString(std::string s
 	return grid;
 }
 
-std::string decrypt128BitMessage(std::vector<std::vector<std::bitset<8>>> grid, std::vector<std::vector<std::bitset<8>>>& key)
+std::string decrypt128BitMessage(std::string cipherText, std::string keyString)
 {
+	auto key = generateGridFromHexString(keyString);
+
+	auto grid = generateGridFromHexString(cipherText);
+
 	auto expandedKey = generateExpandedKey(key);
 	//printExpandedKey(expandedKey);
 	//Initial Round:
@@ -237,8 +248,11 @@ std::string decrypt128BitMessage(std::vector<std::vector<std::bitset<8>>> grid, 
 
 
 
-std::string encrypt128BitMessage(std::vector<std::vector<std::bitset<8>>> grid, std::vector<std::vector<std::bitset<8>>>& key)
+std::string encrypt128BitMessage(std::string plaintext, std::string keyString)
 {
+	auto key = generateGridFromHexString(keyString);
+
+	auto grid = generateGridFromHexString(plaintext);
 
 	auto expandedKey = generateExpandedKey(key);
 	//std::cout << "ExpandedKey: \n";
@@ -578,13 +592,10 @@ void runTests()
 
 //TEST1
 	std::string plaintext = 	"6bc1bee22e409f96e93d7e117393172a";
-	std::string keyString = 	"2b7e151628aed2a6abf7158809cf4f3c";
+	std::string key = 			"2b7e151628aed2a6abf7158809cf4f3c";
 	std::string cipherText = 	"3ad77bb40d7a3660a89ecaf32466ef97";
-	auto grid = generateGridFromHexString(plaintext);
-	auto key = generateGridFromHexString(keyString);
-	auto cipher = generateGridFromHexString(cipherText);
 
-	std::string encrypted = encrypt128BitMessage(grid, key);
+	std::string encrypted = encrypt128BitMessage(plaintext, key);
 	std::cout << "\tTest 1: \n";
 	std::cout << "\t\tEncryption: ";
 	if(cipherText.compare(encrypted) == 0)
@@ -595,14 +606,8 @@ void runTests()
 	{
 		std::cout << "Failed\n";
 	}
-	//std::cout << encrypted << "\n";
-	//std::cout << cipherText << "\n";
-	grid = generateGridFromHexString(encrypted);
-	std::string decrypted = decrypt128BitMessage(grid, key);
 
-	//std::cout << plaintext << "\n";
-	//std::cout << decrypted << "\n";
-
+	std::string decrypted = decrypt128BitMessage(encrypted, key);
 	std::cout << "\t\tDecryption: ";
 	if(decrypted.compare(plaintext) == 0)
 	{
@@ -613,15 +618,13 @@ void runTests()
 		std::cout << "Failed\n";
 	}
 
+
 //TEST2
 	plaintext = 	"ae2d8a571e03ac9c9eb76fac45af8e51";
-	keyString = 	"2b7e151628aed2a6abf7158809cf4f3c";
+	key = 			"2b7e151628aed2a6abf7158809cf4f3c";
 	cipherText = 	"f5d3d58503b9699de785895a96fdbaaf";
-	grid = generateGridFromHexString(plaintext);
-	key = generateGridFromHexString(keyString);
-	cipher = generateGridFromHexString(cipherText);
 
-	encrypted = encrypt128BitMessage(grid, key);
+	encrypted = encrypt128BitMessage(plaintext, key);
 
 	std::cout << "\tTest 2: \n";
 	std::cout << "\t\tEncryption: ";
@@ -634,13 +637,7 @@ void runTests()
 		std::cout << "Failed\n";
 	}
 
-	//std::cout << encrypted << "\n";
-	//std::cout << cipherText << "\n";
-	grid = generateGridFromHexString(encrypted);
-	decrypted = decrypt128BitMessage(grid, key);
-
-	//std::cout << plaintext << "\n";
-	//std::cout << decrypted << "\n";
+	decrypted = decrypt128BitMessage(encrypted, key);
 
 	std::cout << "\t\tDecryption: ";
 	if(decrypted.compare(plaintext) == 0)
@@ -654,13 +651,10 @@ void runTests()
 
 //TEST3
 	plaintext = 	"30c81c46a35ce411e5fbc1191a0a52ef";
-	keyString = 	"2b7e151628aed2a6abf7158809cf4f3c";
+	key =		 	"2b7e151628aed2a6abf7158809cf4f3c";
 	cipherText = 	"43b1cd7f598ece23881b00e3ed030688";
-	grid = generateGridFromHexString(plaintext);
-	key = generateGridFromHexString(keyString);
-	cipher = generateGridFromHexString(cipherText);
 
-	encrypted = encrypt128BitMessage(grid, key);
+	encrypted = encrypt128BitMessage(plaintext, key);
 
 	std::cout << "\tTest 3: \n";
 	std::cout << "\t\tEncryption: ";
@@ -674,8 +668,7 @@ void runTests()
 		std::cout << "Failed\n";
 	}
 
-	grid = generateGridFromHexString(encrypted);
-	decrypted = decrypt128BitMessage(grid, key);
+	decrypted = decrypt128BitMessage(encrypted, key);
 
 	std::cout << "\t\tDecryption: ";
 	if(decrypted.compare(plaintext) == 0)
@@ -690,13 +683,10 @@ void runTests()
 
 //TEST4
 	plaintext = 	"f69f2445df4f9b17ad2b417be66c3710";
-	keyString = 	"2b7e151628aed2a6abf7158809cf4f3c";
+	key =		 	"2b7e151628aed2a6abf7158809cf4f3c";
 	cipherText = 	"7b0c785e27e8ad3f8223207104725dd4";
-	grid = generateGridFromHexString(plaintext);
-	key = generateGridFromHexString(keyString);
-	cipher = generateGridFromHexString(cipherText);
 
-	encrypted = encrypt128BitMessage(grid, key);
+	encrypted = encrypt128BitMessage(plaintext, key);
 
 	std::cout << "\tTest 4: \n";
 	std::cout << "\t\tEncryption: ";
@@ -709,13 +699,8 @@ void runTests()
 	{
 		std::cout << "Failed\n";
 	}
-	//std::cout << encrypted << "\n";
-	//std::cout << cipherText << "\n";
-	grid = generateGridFromHexString(encrypted);
-	decrypted = decrypt128BitMessage(grid, key);
 
-	//std::cout << plaintext << "\n";
-	//std::cout << decrypted << "\n";
+	decrypted = decrypt128BitMessage(encrypted, key);
 
 	std::cout << "\t\tDecryption: ";
 	if(decrypted.compare(plaintext) == 0)
@@ -728,4 +713,3 @@ void runTests()
 	}
 
 }
-
