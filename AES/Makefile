@@ -2,9 +2,9 @@ PROG = AES
 CC = g++
 CXXFLAGS = -std=c++17
 CPPFLAGS = -I /usr/include -L /usr/lib
-LDFLAGS = 
+LDFLAGS =
 
-OBJS = main.o
+OBJS = main.o AES.o
 all: build run
 run:
 	./$(PROG)
