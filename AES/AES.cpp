@@ -36,7 +36,15 @@ std::vector<std::vector<std::bitset<8>>> AES::generateGridFromHexString(std::str
 	{
 		for(int j = 0; j < N; j++)
 		{
-			grid.at(j).at(i) = std::bitset<8>(stoi(s.substr(index, 2), 0, 16));
+			std::string substring = s.substr(index, 2);
+			if(substring.compare("00") == 0)
+			{
+				grid.at(j).at(i) = std::bitset<8>(0);
+			}
+			else
+			{
+				grid.at(j).at(i) = std::bitset<8>(stoi(substring, 0, 16));
+			}
 			index += 2;
 		}
 	}
