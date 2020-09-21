@@ -211,13 +211,35 @@ The Enigma I, had a scheme where one would choose three rotors out of five, and 
  \caption{Rotor specifications for Enigma I}
  \end{figure}
 
-To increase the complexity and challenge of this task, I decided implementing an M3 Enigma. This model had a total of eight rotors to choose from, instead of five. 
+To increase the complexity and challenge of this task, I decided implementing an M3 Enigma. This model had a total of eight rotors to choose from, instead of five. However, reflektor-A seemed to be removed. However, in order for this program to be compatible with the Enigma I, I have decided to include all three reflektors. 
 
 \begin{figure}[H]
  \centering
   \includegraphics[width=300pt]{img/enigmaM3specs.png}
  \caption{Rotor specifications for Enigma M3}
  \end{figure}
+
+For the most part this is quite a trivial task. When pushing a button, the rotors will increment. The signal will run from the button, through the plugboard, through the rotors, into the reflektor, back through the rotors, back through the plugboard, and deliver an output. In code this will for the most part consist of looking up characters in constant arrays, taking into account the current position of the rotors. 
+
+However the thing that stomped me for a while, were the ringsettings. The ringsettings are not dynamically changed, but are set by twisting the actual rotor relative to itself. This combined with the rotor position made me resort to pen and paper. Finally i was able to come up with a working function for a transformation through a rotor with a certain position and ring setting, which can be seen in rotor.cpp, called getTransformedChar().
+
+In order to test the program properly, I generated correct ciphertexts with several different settings at \url{https://cryptii.com/pipes/enigma-machine}.
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=300pt]{img/enigmaTest.png}
+ \caption{Test of Enigma}
+ \end{figure}
+As can be seen in the figure, these strings were quite long in order to go through all the positions several times. These tests will be excluded from the code in the appendix, because of their size.
+
+
+In the figure below, one can see a string be encrypted, decrypted and a check performed to see that it in fact has returned the correct plaintext back.
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=300pt]{img/enigmaMan.png}
+ \caption{Enigma}
+ \end{figure}
+
+
 
 
 %Vedlegg
