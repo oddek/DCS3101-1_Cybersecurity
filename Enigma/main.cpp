@@ -11,7 +11,7 @@ bool fullTest3();
 
 int main(int argc, const char* argv[])
 {
-	bool test = true;
+	bool test = false;
 
 	if(test)
 	{
@@ -41,12 +41,12 @@ int main(int argc, const char* argv[])
 		enigma.printEnigmaStatus();
 
 	
-
 	//Encrypt and decrypt
-		std::string input = "TESTAVENIGMAFRATYSKLANDTESTAVENIGMAFRATYSKLANDTESTAVENIGMAFRATYSTESTAVENIGMAFRATYSKLANDTESTAVENIGMAFRATYSKLANDTESTAVENIGMAFRATYSTESTAVENIGMAFRATYSKLANDTESTAVE";
+		std::string input = "ThisCourseIsAnIntroductionToCyberSecurityThisCourseIsAnIntroductionToCyberSecurityThisCourseIsAnIntroductionToCyberSecurity";
+		std::transform(input.begin(), input.end(), input.begin(), ::toupper);
 		std::string encrypted = enigma.transform(input);
 		//Print settings after encryption:
-		enigma.printEnigmaStatus();
+		//enigma.printEnigmaStatus();
 		//Set offset back, in order to decrypt.
 		enigma.setOffset(offset);
 		std::string decrypted = enigma.transform(encrypted);
@@ -56,6 +56,7 @@ int main(int argc, const char* argv[])
 		std::cout << "Encrypted: " << formatString(encrypted) << "\n";
 		std::cout << "Decrypted: " << formatString(decrypted) << "\n";
 		std::cout << "Checking correct decryption of " << decrypted.size() << " characters..\n";
+		
 		if(input.compare(decrypted) == 0)
 		{
 			std::cout << "Decrypt Success\n";
