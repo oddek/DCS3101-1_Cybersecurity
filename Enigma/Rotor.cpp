@@ -7,7 +7,8 @@ Rotor::Rotor()
 
 Rotor::Rotor(int _id, char _pos)
 {
-	
+	//A bit of extra overhead here, because a rotor may be a reflektor, or it may have two steppingpoints
+
 	rotorPosition = _pos;
 	if(_pos == 'r')
 	{
@@ -45,47 +46,34 @@ int Rotor::modulo(const int& a, const int& b)
 
 char Rotor::getTransformedChar(char c)
 {
-	//std::cout << "Incoming char: " << c << "\n";
 //Operation: c = c + offset - ringsetting
 	c = intToAsciiChar(modulo(charToAlphabetIndex(c) + offset - ringSetting, alphabet.size()));
-	//std::cout << "char is now: " << c << "\n";
 
 //Operation: Normal transformation
 	char o = alphabet.at(charToAlphabetIndex(c));
-	//std::cout << "Char is now after wiring: " << o << "\n";
 
 //Operation: o = o + ringSetting;
 	o = intToAsciiChar(modulo(charToAlphabetIndex(o) + ringSetting, alphabet.size()));
-	//std::cout << "Char is now after adding ringSetting: " << o << "\n";
 
 //Operation: o = o - offset;
 	o = intToAsciiChar((modulo(charToAlphabetIndex(o) - offset, alphabet.size())));
-	//std::cout << "char after final modulo: " << o << "\n";
 	return o;
 }
 
 char Rotor::getInverseTransformedChar(char c)
 {	
-
-	//std::cout << "Inverse input: " << c << "\n";
-
 //Operation: c = c + offset;
 	c = intToAsciiChar(modulo(charToAlphabetIndex(c)+offset, alphabet.size()));
-	//std::cout << "char after first operation: " << c << "\n";
 
 //Operation: c = c -ringSetting;
 	c = intToAsciiChar(modulo(charToAlphabetIndex(c) - ringSetting, alphabet.size()));
-	//std::cout << "char after second operation: " << c << "\n";
 
 //Operation: What gives c in masteralphabet:
 	int i = alphabet.find(c);
 	char o = masterAlphabet.at(i);
-	//std::cout << "char after reg tranformation: " << o << "\n";
 
 //Operation: o = o - offset + ring
 	o = intToAsciiChar(modulo(charToAlphabetIndex(o) - offset + ringSetting, alphabet.size()));
-
-	//std::cout << "Final output: " << o << "\n";
 
 	return o;
 }
@@ -101,7 +89,6 @@ bool Rotor::incrementOffset(bool doubleStep)
 	//If this is the rightmost rotor, and the middle rotor is in doublestep position, we also have to return true;
 	if((offset == steppingPoint || offset == steppingPoint2) || rotorPosition == 'R' && doubleStep) 
 	{
-		//std::cout << "rotor " << rotorPosition << " returning true, on offset " << offset << "\n";
 		return true;
 	}
 	return false;
@@ -145,6 +132,5 @@ void Rotor::printRotorStatus()
 bool Rotor::isDoubleStep()
 {
 	bool ret = (rotorPosition == 'M' && (offset == modulo(steppingPoint - 1, alphabet.size()) || (steppingPoint2 != -1 && offset == modulo(steppingPoint2 -1, alphabet.size()))));
-	//if(ret) std::cout << "DoubleStep = True on offset: " << offset << "\n";
 	return ret;
 }

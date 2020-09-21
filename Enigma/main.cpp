@@ -11,7 +11,7 @@ bool fullTest3();
 
 int main(int argc, const char* argv[])
 {
-	bool test = false;
+	bool test = true;
 
 	if(test)
 	{

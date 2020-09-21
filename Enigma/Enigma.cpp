@@ -84,7 +84,7 @@ std::string Enigma::transform(std::string& input)
 		rotateRotors();
 
 		char temp = std::toupper(c);
-
+		//Through the Plugboard
 		temp = charThroughPlugboard(temp);
 
 		//Through the rotors
