@@ -4,7 +4,7 @@ CPPFLAGS = -I /usr/include -L /usr/lib
 OBJS = main.o
 all: build run
 run:
-	./$(PROG) -e "vigenerecipherispolyalphabetic" "crypto"
+	./$(PROG) -e "The quick brown fox jumps over the lazy dog." "Norway" "oslo"
 
 build: $(PROG)
 
