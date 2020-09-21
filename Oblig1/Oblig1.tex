@@ -386,13 +386,433 @@ int main(int argc, char* argv[])
 
 \subsection{Enigma Code}
 \subsubsection{main.cpp}
+\begin{lstlisting}
+#include <string>
+#include <iostream>
+#include "Rotor.h"
+#include "Enigma.h"
 
+std::string formatString(std::string s);
+
+int main(int argc, const char* argv[])
+{
+	//Setup Enigma
+		//Choose rotors 1-8 - Left to right;
+		int rotorIds[3] = {4,5,6};
+		//Choose Reflektor 1-3 (ABC)
+		int reflektorId = 2;
+		//Set offset and ringSetting 1-26 - Left to right;
+		int offset[3] = {24,12,26};
+		int ringSetting[3] = {13,2,21};
+		//Set upto ten pairs in the plugboard. A letter may only be connected once
+		//The plugboard may also be empty
+		std::vector<std::string> plugboardSettings = 
+		{"AH", "MB", "TO", "EI", "PL", "KC", "NQ", "ZX", "WR"};
+		Enigma enigma(rotorIds, reflektorId, plugboardSettings);
+		enigma.setOffset(offset);
+		enigma.setRingSetting(ringSetting);
+		enigma.printEnigmaStatus();
+
+	
+	//Encrypt and decrypt
+		std::string input = "ThisCourseIsAnIntroductionToCyberSecurityThisCourseIsAnIntroductionToCyberSecurityThisCourseIsAnIntroductionToCyberSecurity";
+		std::transform(input.begin(), input.end(), input.begin(), ::toupper);
+		std::string encrypted = enigma.transform(input);
+		//Print settings after encryption:
+		//enigma.printEnigmaStatus();
+		//Set offset back, in order to decrypt.
+		enigma.setOffset(offset);
+		std::string decrypted = enigma.transform(encrypted);
+
+	//Print results
+		std::cout << "Input:     " << formatString(input) << "\n";
+		std::cout << "Encrypted: " << formatString(encrypted) << "\n";
+		std::cout << "Decrypted: " << formatString(decrypted) << "\n";
+		std::cout << "Checking correct decryption of " << decrypted.size() << " characters..\n";
+
+		if(input.compare(decrypted) == 0)
+		{
+			std::cout << "Decrypt Success\n";
+		}
+		else
+		{
+			std::cout << "Decrypt Failure\n";
+		}
+}
+
+std::string formatString(std::string s)
+{
+	int num = 5;
+	char sep = ' ';
+	for(auto it = s.begin(); (num+1) <= std::distance(it, s.end()); it++)
+	{
+		std::advance(it, num);
+		it = s.insert(it, sep);
+	}
+	return s;
+}
+
+\end{lstlisting}
 \subsubsection{Enigma Class}
+\textbf{Enigma.h}
+\begin{lstlisting}
+#ifndef ENIGMA_H
+#define ENIGMA_H
+#include "Rotor.h"
+#include <vector>
+#include <algorithm>
 
+class Enigma
+{
+public:
+	Enigma(int rotorIds[3], int reflectorId, std::vector<std::string> _plugboardSettings);
+	~Enigma();
+	void printEnigmaStatus();
+	void setRotors(int r[3]);
+	void setOffset(int o[3]);
+	void setRingSetting(int s[3]);
+	std::string transform(std::string& input);
+	
+private:
+	Rotor reflector;
+	std::vector<Rotor> rotors;
+	std::vector<std::string> plugboardSettings;
+	void rotateRotors();
+	char charThroughPlugboard(char c);
+};
+#endif
+\end{lstlisting}
+
+\textbf{Enigma.cpp}
+\begin{lstlisting}
+#include "Enigma.h"
+
+Enigma::Enigma(int rotorIds[3], int reflectorId, std::vector<std::string> _plugboardSettings): reflector(reflectorId, 'r')
+{
+	Rotor rotor1(rotorIds[0], 'L');
+	Rotor rotor2(rotorIds[1], 'M');
+	Rotor rotor3(rotorIds[2], 'R');
+	rotors.push_back(rotor1);
+	rotors.push_back(rotor2);
+	rotors.push_back(rotor3);
+	plugboardSettings = _plugboardSettings;
+}
+
+Enigma::~Enigma()
+{
+
+}
+
+void Enigma::printEnigmaStatus()
+{
+	std::cout << "Enigma Status: \n\tPlugboard: \n\t";
+	for(auto pair : plugboardSettings)
+	{
+		std::cout << pair << " ";
+	} 
+
+	std::cout << "\n\nRotor information from left to right: \n\n";
+
+	for(auto rotor : rotors)
+	{
+		rotor.printRotorStatus();
+	} 
+
+	reflector.printRotorStatus();
+}
+
+void Enigma::setRotors(int r[3])
+{
+
+	for(int i = 0; i <= 2; i++)
+	{
+		Rotor rotor(r[i], r[i]);
+		rotors.push_back(rotor);
+	}
+}
+
+void Enigma::setOffset(int o[3])
+{
+	for(int i = 0; i < rotors.size(); i++)
+	{
+		rotors.at(i).setOffset(o[i] - 1);
+	}
+
+}
+
+void Enigma::setRingSetting(int s[3])
+{
+	for(int i = 0; i < rotors.size(); i++)
+	{
+		rotors.at(i).setRingSetting(s[i] - 1);
+	}
+
+}
+
+void Enigma::rotateRotors()
+{	
+	for(auto it = rotors.rbegin(); it != rotors.rend(); it++)
+	{
+		bool next = it->incrementOffset(rotors.at(1).isDoubleStep());
+		if(!next) break;
+	}	
+	//printRotorStatus();
+	
+}
+
+std::string Enigma::transform(std::string& input)
+{
+	std::string output;
+	
+	for(const char c : input)
+	{
+		rotateRotors();
+
+		char temp = std::toupper(c);
+		//Through the Plugboard
+		temp = charThroughPlugboard(temp);
+
+		//Through the rotors
+		for(auto it = rotors.rbegin(); it != rotors.rend(); it++)
+		{
+			temp = it->getTransformedChar(temp);
+		}
+		//Through the reflector
+		temp = reflector.getTransformedChar(temp);
+		
+		//Through the rotors backwards
+		for(auto it = rotors.begin(); it != rotors.end(); it++)
+		{
+			temp = it->getInverseTransformedChar(temp);
+		}
+
+		temp = charThroughPlugboard(temp);
+
+		output += temp;
+	}
+	return output;
+}
+
+char Enigma::charThroughPlugboard(char c)
+{
+	for(auto pair : plugboardSettings)
+	{
+		if(pair.front() == c) return pair.back();
+		if(pair.back() == c) return pair.front();
+	}
+	return c;
+}
+\end{lstlisting}
 \subsubsection{Rotor Class}
+\textbf{Rotor.h}
+\begin{lstlisting}
+#include <string>
+#include <iostream>
+#ifndef ROTOR_H
+#define ROTOR_H
 
+class Rotor
+{
+public:
+	Rotor();
+	Rotor(int _id, char _pos);
+	~Rotor();
+	char getTransformedChar(char c);
+	char getInverseTransformedChar(char c);
+	void setRingSetting(int i);
+	bool incrementOffset(bool doubleStep);
+	void setOffset(int i);
+	void printRotorStatus();
+	bool isDoubleStep();
+private:
+	std::string alphabet;
+	int ringSetting;
+	int offset;
+	int steppingPoint;
+	int steppingPoint2 = -1;
+	char intToAsciiChar(int i);
+	int rotorId = 0;
+	char rotorPosition;
+	int charToAlphabetIndex(char c);
+	int modulo(const int& a, const int& b);
+	const int asciiOffset = 65;
+};
 
+//Assorted rotor data etc. 
+static const std::string masterAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+static const std::string rotorAlphabets[9] = 
+{
+	"", //Dummy alphabet
+	"EKMFLGDQVZNTOWYHXUSPAIBRCJ",
+	"AJDKSIRUXBLHWTMCQGZNPYFVOE",
+	"BDFHJLCPRTXVZNYEIWGAKMUSQO",
+	"ESOVPZJAYQUIRHXLNFTGKDCMWB",
+	"VZBRGITYUPSDNHLXAWMJQOFECK",
+	"JPGVOUMFYQBENHZRDKASXLICTW",
+	"NZJHGRCXMYSWBOUFAIVLPEKQDT",
+	"FKQHTLXOCBJSPDZRAMEWNIUYGV"
+};
+//Rotors will step the next, when stepping to these characters
+static const std::string stepPoints[] = 
+{
+	"0", //Dummy stepper
+	"R",
+	"F",
+	"W",
+	"K",
+	"A",
+	"AN" //Have to add another stepping point at 'N' for this
+};
 
+static const std::string reflectorAlphabets[] = 
+{
+	"", //Dummy alphabet
+	"EJMZALYXVBWFCRQUONTSPIKHGD",
+	"YRUHQSLDPXNGOKMIEBFZCWVJAT",
+	"FVPJIAOYEDRZXWGCTKUQSBNMHL"
+};
+#endif
+\end{lstlisting}
+
+\textbf{Rotor.cpp}
+\begin{lstlisting}
+#include "Rotor.h"
+
+Rotor::Rotor()
+{
+
+}
+
+Rotor::Rotor(int _id, char _pos)
+{
+	//A bit of extra overhead here, because a rotor may be a reflektor, or it may have two steppingpoints
+
+	rotorPosition = _pos;
+	if(_pos == 'r')
+	{
+		rotorId = _id;
+		alphabet = reflectorAlphabets[_id];
+	}
+	else
+	{
+		rotorId = _id;
+		alphabet = rotorAlphabets[_id];
+	}
+	ringSetting = 0;
+	offset = 0;
+	
+	if(_id == 6 || _id == 7 || _id == 8)
+	{
+		steppingPoint = charToAlphabetIndex(stepPoints[6].at(0));
+		steppingPoint2 = charToAlphabetIndex(stepPoints[6].at(1));
+	}
+	else
+	{
+		steppingPoint = charToAlphabetIndex(stepPoints[_id].at(0));
+	}
+}
+
+Rotor::~Rotor()
+{
+
+}
+
+int Rotor::modulo(const int& a, const int& b)
+{
+	return (b + (a % b)) % b;
+}
+
+char Rotor::getTransformedChar(char c)
+{
+//Operation: c = c + offset - ringsetting
+	c = intToAsciiChar(modulo(charToAlphabetIndex(c) + offset - ringSetting, alphabet.size()));
+
+//Operation: Normal transformation
+	char o = alphabet.at(charToAlphabetIndex(c));
+
+//Operation: o = o + ringSetting;
+	o = intToAsciiChar(modulo(charToAlphabetIndex(o) + ringSetting, alphabet.size()));
+
+//Operation: o = o - offset;
+	o = intToAsciiChar((modulo(charToAlphabetIndex(o) - offset, alphabet.size())));
+	return o;
+}
+
+char Rotor::getInverseTransformedChar(char c)
+{	
+//Operation: c = c + offset;
+	c = intToAsciiChar(modulo(charToAlphabetIndex(c)+offset, alphabet.size()));
+
+//Operation: c = c -ringSetting;
+	c = intToAsciiChar(modulo(charToAlphabetIndex(c) - ringSetting, alphabet.size()));
+
+//Operation: What gives c in masteralphabet:
+	int i = alphabet.find(c);
+	char o = masterAlphabet.at(i);
+
+//Operation: o = o - offset + ring
+	o = intToAsciiChar(modulo(charToAlphabetIndex(o) - offset + ringSetting, alphabet.size()));
+
+	return o;
+}
+
+void Rotor::setRingSetting(int i)
+{
+ 	ringSetting = i;
+}
+
+bool Rotor::incrementOffset(bool doubleStep)
+{
+	offset = modulo(offset + 1, alphabet.size());
+	//If this is the rightmost rotor, and the middle rotor is in doublestep position, we also have to return true;
+	if((offset == steppingPoint || offset == steppingPoint2) || rotorPosition == 'R' && doubleStep) 
+	{
+		return true;
+	}
+	return false;
+}
+
+void Rotor::setOffset(int i)
+{
+	offset = i;
+}
+
+char Rotor::intToAsciiChar(int i)
+{
+	return char(i + asciiOffset);
+}
+
+int Rotor::charToAlphabetIndex(char c)
+{
+	int i = (int)c - asciiOffset;
+	return i;
+}
+
+void Rotor::printRotorStatus()
+{
+	if(rotorPosition == 'r')
+	{
+		std::cout << "\tReflector: "<< rotorId << "\n";
+		std::cout << "\t\tAlphabet: " << alphabet << "\n\n\n";
+	}
+	else
+	{
+		std::cout << "\t" << rotorPosition << "-rotor\n";
+		std::cout << "\t\tRotorId: " << rotorId << "\n";
+		std::cout << "\t\tStepping point: " << steppingPoint << "\n";
+		if(steppingPoint2 != -1) std::cout << "\t\tStepping point2: " << steppingPoint2 << "\n";
+		std::cout << "\t\tCurrent offset:" << offset << "\n";
+		std::cout << "\t\tCurrent RingSetting: " << ringSetting << "\n";
+		std::cout << "\t\tAlphabet: " << alphabet << "\n\n\n";
+	}
+}
+//If the middle rotor is at the position before it is supposed to step the next, it shall just step to the next;
+bool Rotor::isDoubleStep()
+{
+	bool ret = (rotorPosition == 'M' && (offset == modulo(steppingPoint - 1, alphabet.size()) || (steppingPoint2 != -1 && offset == modulo(steppingPoint2 -1, alphabet.size()))));
+	return ret;
+}
+\end{lstlisting}
 
 \newpage
 %Referanse
