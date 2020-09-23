@@ -64,7 +64,10 @@ texcl=true,
 \title{Introduction to Cybersecurity, Assignment 1}
 
 \maketitle
-
+\thispagestyle{empty}
+\begin{center}
+\includegraphics[width=\linewidth,height=0.2\textheight,keepaspectratio]{img/USN.png}
+\end{center}
 \newpage
 
 \tableofcontents
@@ -73,6 +76,10 @@ texcl=true,
 
 \section{Abstract}
 
+This is my submition for the first assignment in DCS3101, Introduction to Cybersecurity. 
+
+The complete source code for both the Vignere cipher and Enigma program can be found in the appendices, however I will happily provide the source files upon request.
+
 %Innholdsfortegnelse
 \section{Q1}
 
@@ -80,9 +87,9 @@ texcl=true,
 
 Alice wants to send the message "Introduction to Data and Cyber-Security (DCS3101)" to Bob. If she wants to employ the CIA concepts in the sending of this message, she has to ensure three things:
 \begin{itemize}
-\item{\textbf{Confidentiality}: She will have to make sure that Bob is the only one that will be able to read the contents, and that all other third parties will not.}
-\item{\textbf{Integrity}: This means making sure that Bob can be certain that the message he receives is in fact the intended message communicated by Alice. Simply put, he needs to know that the contents has not been altered in any way.}
-\item{\textbf{Availability}: All the security in the world is meaningless if Bob is not able to decrypt the message. The correct contents of the message must be available for the intended receiver, at the right time.}
+\item{\textbf{Confidentiality}: She will have to make sure that Bob is the only one that will be able to read the contents, and that all other third parties will not. Encrypting the message with a block encryption scheme like AES or DES, and using something like cipher-block-chaining, electronic code book etc. to handle the blocks is ways in which we Alice may obtain confidentiality.}
+\item{\textbf{Integrity}: This means making sure that Bob can be certain that the message he receives is in fact the intended message communicated by Alice. Simply put, he needs to know that the contents has not been altered in any way. Integrity can be provided by using a hashing function as a signature. If the Bob can match up the provided signature with the output of hashing part of the message, he can be sure that the message sent from Alice has not been changed in any way.}
+\item{\textbf{Availability}: All the security in the world is meaningless if Bob is not able to decrypt the message. The correct contents of the message must be available for the intended receiver, at the right time. This explaination is a bit superficial, as this topic haven't been covered as much as the others so far in the course. }
 \end{itemize}
 
 These three properties are by no means independent, and one will always have to analyze ones needs, and do a trade-off analysis between the three.
@@ -162,6 +169,61 @@ When writing the vignere ciphering program, i assumed the following:
 \item{In the part with two keys, I assumed that the purpose is to encrypt the message twice, using two different keys}
 \end{itemize}
 
+In the code, I found it easiest to make use of the ascii table, where upper case letters are shifted within the range of 65 and 90, and the lower case letters are in the range of 97 to 122.
+
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=300pt]{img/ASCII.png}
+ \caption{ASCII table \cite{ASCII}}
+ \end{figure}
+
+The most essence of the code lies in these two functions. We loop through the plaintext, while keeping another int to keep track of where in the keyword we are. We shift the currenct character in the plaintext by the relative value of the current letter in the keyword. 
+
+\begin{lstlisting}
+char shiftChar(char c,  char shiftBy, bool backward = false)
+{	
+	/*
+	Checking if the characters upper or lower case, and chooses the asciiboundaries of the respective set.
+	*/
+	int startAscii = (c >= STARTASCIILOWER) ? STARTASCIILOWER : STARTASCIIUPPER;
+	int stopAscii = (c >= STARTASCIILOWER) ? STOPASCIILOWER : STOPASCIIUPPER;
+
+	/*
+	Move the character downto the 0-25 range, performing the shift, and moving it back up the correct asciirange. 
+	*/
+	char output = c - startAscii;
+	if(backward)
+	{
+		output = modulo((output - (shiftBy - STARTASCIILOWER)), (stopAscii - startAscii + 1)) + startAscii;
+	}
+	else
+	{
+		output = modulo((output + (shiftBy - STARTASCIILOWER)), (stopAscii - startAscii + 1)) + startAscii;
+	}
+	return output;
+}
+
+std::string encrypt(std::string plainText, std::string key)
+{
+	int keyIndex = 0;
+	std::string cipherText;
+	for(int i = 0; i < plainText.size(); i++)
+	{
+		/*
+		Dont encrypt spaces, commas and periods.
+		*/
+		if(plainText[i] == ' ' || plainText[i] == '.' || plainText[i] == ',')
+		{
+			cipherText += plainText[i];
+			continue;
+		}
+		cipherText += (shiftChar(plainText[i], key.at(keyIndex)));
+		keyIndex = (keyIndex + 1) % key.size();
+	}
+	return cipherText;
+}
+\end{lstlisting}
+
 \subsubsection{Single Key}
 
 The text given in the task, encrypted with the key \textit{kongsberg}, became:
@@ -180,8 +242,7 @@ The result can also be seen in the figure below:
 \subsubsection{Two Keys}
 
 
-
-Encrypted twice, with the keys \textit{norway} and \textit{oslo}, became:
+Encrypted twice, with the keys \textit{norway} and \textit{oslo} respectively, became:
 \begin{align*}
 Ung\quad aiyam\quad gfzio\quad lqh\quad xkkrx\quad cgqs\quad zjo\quad zqxa\quad icr.
 \end{align*}
@@ -196,19 +257,34 @@ The result can also be seen in the figure below:
 %Implementation
 \section{Q3}
 Lets start by defining the terms diffusion and confusion.
+
+Confusion, in essence deals with obscuring the link between the key and the ciphertext, while diffusion deals with hiding the relationship between the plaintext and the ciphertext. More concretely this means that if we change a bit in the key, we must provide enough confusion, so that almost all of the ciphertext will also be affected by this change. In a similar manor, if we change a single bit of the plaintext, diffusion should be provided so that this will change at least half of the bits in the plaintext. 
+
+In practice these two properties can be obtained in different ways. We will have a look at how they are obtained in DES (Data Encryption Standard). 
+
+DES is built of a SP-network, more specifically a feistel structure. It uses substitition and permutation over 16 rounds along with a 56 bit key, which is expanded into 16 round keys. 
+
+Confusion within DES is obtained by the substitution and the diffusion is obtained by the permutation. 
+
+Substitution is basically a rule set where in the case of DES, a six bit input, will be replaced by a four bit outbit, according the the specific S-box.
+Permutation changes the bit position of the input, which hides the statistical properties of the original plaintext. 
+
+In DES confusion is also obtained by the expansion function. It takes a 32 bit input, and produces a 48 bit output, by duplicating some of the original bits. 
+
+
 %Konklusjon
 \section{Q4 - Enigma}
 
-In this task, I will assume knowledge about the Enigma machine on the part of the reader, and not go into the details as this would lead to a very extensive task. There are also some conflicting sources of information about the Enigma. I have gathered all data about models, rotors and reflektors from \cite{ENIGMA1} \cite{ENIGMA2}
+In this task, I will assume knowledge about the Enigma machine on the part of the reader, and not go into the details as this would lead to a very extensive task. There are also some conflicting sources of information about the Enigma. I have gathered all data about models, rotors and reflektors from \cite{ENIGMA1} and \cite{ENIGMA2}
 
 The Enigma I, had a scheme where one would choose three rotors out of five, and one reflektor out of three. This can be seen in the figure below. 
 
-\textit{Some sources say that the Enigma I had only three rotors and some say five.}
+\textit{Some sources say that the Enigma I had only three rotors and some say five. However I think it was upgraded at some point, so both statements may have been true at some point. The three out of five scheme seems to be the more common one.}
 
 \begin{figure}[H]
  \centering
   \includegraphics[width=300pt]{img/enigmaIspecs.png}
- \caption{Rotor specifications for Enigma I}
+ \caption{Rotor specifications for Enigma I \cite{ENIGMA2}}
  \end{figure}
 
 To increase the complexity and challenge of this task, I decided implementing an M3 Enigma. This model had a total of eight rotors to choose from, instead of five. However, reflektor-A seemed to be removed. However, in order for this program to be compatible with the Enigma I, I have decided to include all three reflektors. 
@@ -216,12 +292,32 @@ To increase the complexity and challenge of this task, I decided implementing an
 \begin{figure}[H]
  \centering
   \includegraphics[width=300pt]{img/enigmaM3specs.png}
- \caption{Rotor specifications for Enigma M3}
+ \caption{Rotor specifications for Enigma M3 \cite{ENIGMA2}}
  \end{figure}
 
 For the most part this is quite a trivial task. When pushing a button, the rotors will increment. The signal will run from the button, through the plugboard, through the rotors, into the reflektor, back through the rotors, back through the plugboard, and deliver an output. In code this will for the most part consist of looking up characters in constant arrays, taking into account the current position of the rotors. 
 
-However the thing that stomped me for a while, were the ringsettings. The ringsettings are not dynamically changed, but are set by twisting the actual rotor relative to itself. This combined with the rotor position made me resort to pen and paper. Finally i was able to come up with a working function for a transformation through a rotor with a certain position and ring setting, which can be seen in rotor.cpp, called getTransformedChar().
+However the thing that stomped me for a while, were the ringsettings. The ringsettings are not dynamically changed, but are set by twisting the actual rotor relative to itself. This combined with the rotor position made me resort to pen and paper. Finally i was able to come up with a working function for a transformation through a rotor with a certain position and ring setting, which can be seen in the code below:
+
+\begin{lstlisting}
+char Rotor::getTransformedChar(char c)
+{
+//Operation: c = c + offset - ringsetting
+	c = intToAsciiChar(modulo(charToAlphabetIndex(c) + offset - ringSetting, alphabet.size()));
+
+//Operation: Normal transformation
+	char o = alphabet.at(charToAlphabetIndex(c));
+
+//Operation: o = o + ringSetting;
+	o = intToAsciiChar(modulo(charToAlphabetIndex(o) + ringSetting, alphabet.size()));
+
+//Operation: o = o - offset;
+	o = intToAsciiChar((modulo(charToAlphabetIndex(o) - offset, alphabet.size())));
+	return o;
+}
+\end{lstlisting}
+
+
 
 In order to test the program properly, I generated correct ciphertexts with several different settings at \url{https://cryptii.com/pipes/enigma-machine}.
 \begin{figure}[H]
