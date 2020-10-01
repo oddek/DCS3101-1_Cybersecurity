@@ -76,9 +76,9 @@ texcl=true,
 
 \section{Abstract}
 
-This is my submition for the first assignment in DCS3101, Introduction to Cybersecurity. 
+This is my submission for the first assignment in DCS3101, Introduction to Cybersecurity. 
 
-The complete source code for both the Vignere cipher and Enigma program can be found in the appendices, however I will happily provide the source files upon request.
+The complete source code for both the Vignere cipher and Enigma program can be found both in the appendices in the appendices of this report, as well as in the folder \textit{src}. Some test vectors for the enigma program have been removed from the report, as they are 70 000 characters long each. 
 
 %Innholdsfortegnelse
 \section{Q1}
@@ -87,9 +87,9 @@ The complete source code for both the Vignere cipher and Enigma program can be f
 
 Alice wants to send the message "Introduction to Data and Cyber-Security (DCS3101)" to Bob. If she wants to employ the CIA concepts in the sending of this message, she has to ensure three things:
 \begin{itemize}
-\item{\textbf{Confidentiality}: She will have to make sure that Bob is the only one that will be able to read the contents, and that all other third parties will not. Encrypting the message with a block encryption scheme like AES or DES, and using something like cipher-block-chaining, electronic code book etc. to handle the blocks is ways in which we Alice may obtain confidentiality.}
-\item{\textbf{Integrity}: This means making sure that Bob can be certain that the message he receives is in fact the intended message communicated by Alice. Simply put, he needs to know that the contents has not been altered in any way. Integrity can be provided by using a hashing function as a signature. If the Bob can match up the provided signature with the output of hashing part of the message, he can be sure that the message sent from Alice has not been changed in any way.}
-\item{\textbf{Availability}: All the security in the world is meaningless if Bob is not able to decrypt the message. The correct contents of the message must be available for the intended receiver, at the right time. This explaination is a bit superficial, as this topic haven't been covered as much as the others so far in the course. }
+\item{\textbf{Confidentiality}: She will have to make sure that Bob is the only one that will be able to read the contents, and that all other third parties will not. Encrypting the message with a block encryption scheme like AES or DES, and using something like cipher-block-chaining, electronic code book etc. to handle the blocks are ways in which Alice may obtain confidentiality.}
+\item{\textbf{Integrity}: This means making sure that Bob can be certain that the message he receives is in fact the intended message communicated by Alice. Simply put, he needs to know that the contents has not been altered in any way. Integrity can be provided by using a hashing function as a signature. If Bob can match up the provided signature with the output of hashing part of the message, he can be sure that the message sent from Alice has not been changed in any way.}
+\item{\textbf{Availability}: All the security in the world is meaningless if Bob is not able to decrypt the message. The correct contents of the message must be available for the intended receiver, at the right time. This explanation is a bit superficial, as this topic haven't been covered as much as the others so far in the course. }
 \end{itemize}
 
 These three properties are by no means independent, and one will always have to analyze ones needs, and do a trade-off analysis between the three.
@@ -101,6 +101,8 @@ High confidentiality and integrity may lead to lowered availability. Either in t
 \subsection{Illustration of Vignere Ciphering}
 
 In order to explain Vignere ciphering, we have to realize that Vignere ciphering is nothing more than an an expanded and enhanced version of Ceasar ciphering. Let's start off by explaining a Ceasar Cipher. 
+
+\subsubsection{Ceasar Cipher}
 
 Ceasar Cipher is a ciphering scheme where we apply an operation to all of the characters in a string. This may be shifting each character by +5 places. In this case we say that the key is F, as it is the letter with the value of 5, given that we count A as 0.
 
@@ -118,11 +120,15 @@ There are many flaws in this scheme, where the most obvious one is that the oper
  \caption{English letter frequency\cite{LETTER}}
  \end{figure}
 
-In this graph we see that the most common letters in the english language are E, T, A and O. If we assume this is also true for our ciphertex HTIJBTWI, we can guess that either the T or the I will map to one of these letters. If we start at the top with the letter I, we will only need to test 4 operations, before arriving at the correct one. 
+In this graph we see that the most common letters in the English language are E, T, A and O. If we assume this is also true for our cipher text in figure 1, \textit{HTIJBTWI}, we can guess that either the T or the I will map to one of these letters. If we start at the left of the graph, and assume that the letter \textit{T} is really \textit{E}, we will only need to test 3 inverse operations (E, T, A), before arriving at the correct one (that I is equal to O). Of course testing for T, can be omitted completely.
 
-A vignerecipher attemps to increase the complexity of the Ceasar Cipher by having the operations change for each character. 
+ This is a very small sample size, and as the text grows, the statistical properties of the language will be even more likely to correspond with our text. 
 
-Instead of having a key like F in the caesarcipher, we use a key where the number of characters is greater than one. The length of the key naturally increases the robustness of the encryption. 
+\subsubsection{Vignere Cipher}
+
+A vignere cipher attempts to increase the complexity of the Ceasar Cipher by having the operations change for each character. 
+
+Instead of having a key like F in the caesar cipher, we use a key where the number of characters is greater than one. The length of the key naturally increases the robustness of the encryption. 
 
 \begin{figure}[H]
  \centering
@@ -138,7 +144,7 @@ In the example where the key is 'KEY', we use the key 'K' on the first character
  \caption{Vignere 2}
  \end{figure}
 
-In the following figure, we can see that the two O's and the two D's not longer map to the same letter, as was the problem with the Ceasar Cipher. In the ciphertext we can also see a couple of examples where two equal letters, like M and B, map back two different letters in the plaintext. 
+In the following figure, we can see that the two O's and the two D's no longer map to the same letter, as was the problem with the Ceasar Cipher. In the ciphertext we can also see a couple of examples where two equal letters, like M and B, map back two different letters in the plaintext. 
 
 \begin{figure}[H]
  \centering
@@ -148,7 +154,7 @@ In the following figure, we can see that the two O's and the two D's not longer 
 
 
 
-If the message is shorter than the key, or if the key is not a multiple of the message (like in the example), we may add padding to the plaintext before encrypting. This is a mechanism of making the messages harder to diciphire, because the length of the ciphertext, does not necessarily match the length of the plaintext. The padding should not however consist of the same character. If one tries to shift the last few characters through the alphabet, the key may become obvious from this. As an illustration, let us imagine padding the message with the letter A. 
+If the message is shorter than the key, or if the key is not a multiple of the message (like in the example), we may add padding to the plaintext before encrypting. This is a mechanism of making the messages harder to decipher, because the length of the ciphertext, does not necessarily match the length of the plaintext. The padding should not however consist of the same character. If one tries to shift the last few characters through the alphabet, the key may become obvious from this. As an illustration, let us imagine padding the message with the letter A. 
 
 \begin{figure}[H]
  \centering
@@ -160,7 +166,7 @@ This is of course an extreme example, because A will just give the key in plaint
 
 \subsection{Vignere Cipher Program}
 
-When writing the vignere ciphering program, i assumed the following:
+When writing the Vignere ciphering program, i assumed the following:
 \begin{itemize}
 \item{Upper case characters will be encrypted within the set of upper case characters}
 \item{Lower case characters will be encrypted within the set of lower case characters}
@@ -177,7 +183,7 @@ In the code, I found it easiest to make use of the ascii table, where upper case
  \caption{ASCII table \cite{ASCII}}
  \end{figure}
 
-The most essence of the code lies in these two functions. We loop through the plaintext, while keeping another int to keep track of where in the keyword we are. We shift the currenct character in the plaintext by the relative value of the current letter in the keyword. 
+The essence of the code lies in these two functions. We loop through the plaintext, while keeping another integer variable to keep track of where in the keyword we are. We shift the currenct character in the plaintext by the relative value of the current letter in the keyword. 
 
 \begin{lstlisting}
 char shiftChar(char c,  char shiftBy, bool backward = false)
@@ -262,7 +268,7 @@ Confusion, in essence deals with obscuring the link between the key and the ciph
 
 In practice these two properties can be obtained in different ways. We will have a look at how they are obtained in DES (Data Encryption Standard). 
 
-DES is built of a SP-network, more specifically a feistel structure. It uses substitition and permutation over 16 rounds along with a 56 bit key, which is expanded into 16 round keys. 
+DES is built of a SP-network, more specifically a feistel structure. It uses substitution and permutation over 16 rounds along with a 56 bit key, which is expanded into 16 round keys. 
 
 Confusion within DES is obtained by the substitution and the diffusion is obtained by the permutation. 
 
@@ -275,9 +281,9 @@ In DES confusion is also obtained by the expansion function. It takes a 32 bit i
 %Konklusjon
 \section{Q4 - Enigma}
 
-In this task, I will assume knowledge about the Enigma machine on the part of the reader, and not go into the details as this would lead to a very extensive task. There are also some conflicting sources of information about the Enigma. I have gathered all data about models, rotors and reflektors from \cite{ENIGMA1} and \cite{ENIGMA2}
+In this task, I will assume knowledge about the Enigma machine on the part of the reader, and not go into the details as this would lead to a very extensive task. There are also some conflicting sources of information about the Enigma. I have gathered all data about models, rotors and reflectors from \cite{ENIGMA1} and \cite{ENIGMA2}
 
-The Enigma I, had a scheme where one would choose three rotors out of five, and one reflektor out of three. This can be seen in the figure below. 
+The Enigma I, had a scheme where one would choose three rotors out of five, and one reflector out of three. This can be seen in the figure below. 
 
 \textit{Some sources say that the Enigma I had only three rotors and some say five. However I think it was upgraded at some point, so both statements may have been true at some point. The three out of five scheme seems to be the more common one.}
 
@@ -287,7 +293,7 @@ The Enigma I, had a scheme where one would choose three rotors out of five, and 
  \caption{Rotor specifications for Enigma I \cite{ENIGMA2}}
  \end{figure}
 
-To increase the complexity and challenge of this task, I decided implementing an M3 Enigma. This model had a total of eight rotors to choose from, instead of five. However, reflektor-A seemed to be removed. However, in order for this program to be compatible with the Enigma I, I have decided to include all three reflektors. 
+To increase the complexity and challenge of this task, I decided implementing an M3 Enigma. This model had a total of eight rotors to choose from, instead of five. However, reflector-A seemed to be removed. In order for this program to be compatible with the Enigma I, I have decided to include all three reflectors. 
 
 \begin{figure}[H]
  \centering
@@ -295,9 +301,9 @@ To increase the complexity and challenge of this task, I decided implementing an
  \caption{Rotor specifications for Enigma M3 \cite{ENIGMA2}}
  \end{figure}
 
-For the most part this is quite a trivial task. When pushing a button, the rotors will increment. The signal will run from the button, through the plugboard, through the rotors, into the reflektor, back through the rotors, back through the plugboard, and deliver an output. In code this will for the most part consist of looking up characters in constant arrays, taking into account the current position of the rotors. 
+For the most part this is quite a trivial task. When pushing a button, the rotors will increment. The signal will run from the button, through the plug-board, through the rotors, into the reflector, back through the rotors, back through the plug-board, and deliver an output. In code this will for the most part consist of looking up characters in constant arrays, taking into account the current position of the rotors. 
 
-However the thing that stomped me for a while, were the ringsettings. The ringsettings are not dynamically changed, but are set by twisting the actual rotor relative to itself. This combined with the rotor position made me resort to pen and paper. Finally i was able to come up with a working function for a transformation through a rotor with a certain position and ring setting, which can be seen in the code below:
+However the thing that stomped me for a while, were the ring-settings. The ring-settings are not dynamically changed, but are set by twisting the actual rotor relative to itself. This combined with the rotor position made me resort to pen and paper. Finally i was able to come up with a working function for a transformation through a rotor with a certain position and ring setting, which can be seen in the code below:
 
 \begin{lstlisting}
 char Rotor::getTransformedChar(char c)
