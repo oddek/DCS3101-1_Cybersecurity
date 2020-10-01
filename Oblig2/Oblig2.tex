@@ -1,0 +1,239 @@
+%\UseRawInputEncoding
+\documentclass{article}
+\setcounter{secnumdepth}{0}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%\usepackage[latin1]{inputenc}
+%\usepackage[english, norsk]{babel}
+\usepackage{filecontents}
+\usepackage{tcolorbox}
+\usepackage{url}
+\usepackage{etoolbox}
+\usepackage{framed}
+\usepackage{framed, color}
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage{float}
+\usepackage{gensymb}
+\usepackage{amsmath}
+
+\definecolor{Black}{rgb}{0.0, 0.0, 0.0}
+
+%Definer kode
+\usepackage{listings}
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+extendedchars = true,
+texcl=true,
+  language=C++,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\usepackage[colorlinks]{hyperref}
+\hypersetup{citecolor=Black}
+\hypersetup{linkcolor=Black}
+\hypersetup{urlcolor=Black}
+\usepackage{cleveref}
+
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+%\renewcommand{\baselinestretch}{2.0}
+
+%\renewcommand\thesubsection{\alph{subsection}}
+
+\renewcommand{\figurename}{Figure}
+\begin{document}
+\author{Kent Odde}
+\title{Assignment 2 \\DCS3101}
+
+\maketitle
+\thispagestyle{empty}
+\begin{center}
+\includegraphics[width=\linewidth,height=0.2\textheight,keepaspectratio]{img/USN.png}
+\end{center}
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Abstract}
+
+%Innholdsfortegnelse
+\section{Q1}
+
+There are several ways of visualizing an algorithm, i have chosen to include a visual representation first:
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=100pt]{img/decryptAES.png}
+ \caption{Algorithm for decrypting AES}
+ \end{figure}
+
+
+However, as code is perhaps the most precise way to describe an algorithm, and I already happen to have implemented AES encryption in C++, i decided to also include the decrypt function from that implementation: 
+
+\begin{lstlisting}
+std::string AES::decrypt128BitMessage(std::string cipherText, std::string keyString)
+{
+	auto key = generateGridFromHexString(keyString);
+	auto grid = generateGridFromHexString(cipherText);
+	auto expandedKey = generateExpandedKey(key);
+
+	//Initial Round:
+	addRoundKey(grid, expandedKey.at(expandedKey.size() - 1));
+
+	//9 Rounds
+	for(int i = expandedKey.size() - 2; i > 0; i--)
+	{
+		invShiftGrid(grid);
+		invSubstitute(grid);
+		addRoundKey(grid, expandedKey.at(i));
+		invMixColumns(grid);
+	}
+
+	//Final Round
+	invShiftGrid(grid);
+	invSubstitute(grid);
+	addRoundKey(grid, expandedKey.at(0));
+
+	return gridToHexString(grid);
+}
+\end{lstlisting}
+
+\newpage
+\section{Q2}
+\newpage
+\section{Q3}
+
+ECB, CBC, OFB etc. are modes of operation i stream ciphers or when it comes to encrypting data that is longer than the block size given within a certain block cipher algorithm. For instance in AES, a block is 128 bits. If you however want to encrypt more data than this, we use for instance CBC in order to provide additional security across the blocks. The principle is to treat the blocks as a stream.
+
+In this task we have been given these parameters for demonstrating the different modes of operation:
+\begin{itemize}
+\item{Plaintext: \textit{DCS-3101}}
+\item{IV: \textit{NO}}
+\item{Key: \textit{EU}}
+\item{Block size: \textit{16 bits}}
+\item{Encryption: \textit{XOR}}
+\end{itemize}
+
+The block size of sixteen bits means that each block will have two characters, and we will end up with four blocks.
+
+Converted to binary, the plaintext string looks like this: 
+\begin{tcolorbox}
+\begin{center}
+\textcolor{blue}{01000100 01000011 01010011 00101101 \\00110011 00110001 00110000 00110001}
+\end{center}
+\end{tcolorbox}
+
+The block size of sixteen bits means that each block will have two characters, and we will end up with four blocks.
+
+\begin{tcolorbox}
+\begin{center}
+\textcolor{blue}{
+\makebox[1.5cm]{\textbf{DC}}:\qquad01000100 01000011\\
+\makebox[1.5cm]{\textbf{S-}}:\qquad01010011 00101101\\
+\makebox[1.5cm]{\textbf{31}}:\qquad00110011 00110001\\
+\makebox[1.5cm]{\textbf{01}}:\qquad00110000 00110001}
+\end{center}
+\end{tcolorbox}
+
+The key and IV converted to binary looks like this: 
+\begin{tcolorbox}
+\begin{center}
+\textcolor{blue}{
+\makebox[1.5cm]{\textbf{IV}}:\qquad01001110 01001111\\
+\makebox[1.5cm]{\textbf{KEY}}:\qquad01000101 01010101}
+\end{center}
+\end{tcolorbox}
+
+
+
+
+\subsection{1. ECB}
+
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=300pt]{img/ecbLecture.png}
+ \caption{ECB encryption diagram from lecture}
+ \end{figure}
+
+
+ECB is the simplest of the three modes of operation discussed in this assignment, and provide no addition security. The principle is to divide the text into blocks, encrypt them with whatever way we like, and concatenate the ciphertexts produced. This means that if you break one of the blocks, you will be able to break them all. However, an error will not propogate through the blocks. 
+
+In practice it will look like this:
+%%%FIX XOR FUNCTION
+
+%DO THE REST IN HEX, THIS IS MADNESS!!!!
+\begin{scriptsize}
+\begin{tcolorbox}
+\begin{center}
+\textcolor{blue}{
+ 01000100 01000011\quad 01010011 00101101\quad  00110011 00110001\quad  00110000 00110001\\
+\makebox[1.5cm]{\textbf{XOR}}\\
+01000101 01010101\quad 01000101 01010101\quad 01000101 01010101\quad 01000101 01010101\\
+\makebox[1.5cm]{\textbf{=}}\\
+100010110000101100111100001110110011001000111010101100100
+}
+
+\end{center}
+\end{tcolorbox}
+\end{scriptsize}
+
+
+\subsection{2. CBC}
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=300pt]{img/cbcLecture.png}
+ \caption{CBC encryption diagram from lecture}
+ \end{figure}
+\subsection{3. OFB}
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=300pt]{img/ofbEnLecture.png}
+ \caption{OFB encryption diagram from lecture}
+ \end{figure}
+\subsection{4. OFB - Decryption}
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=300pt]{img/ofbDeLecture.png}
+ \caption{OFB decryption diagram from lecture}
+ \end{figure}
+
+
+\section{Q4}
+
+
+
+
+%Vedlegg
+\section{Appendices}
+
+
+\newpage
+%Referanse
+%\section{Referanser}
+
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{ref}
+
+\addcontentsline{toc}{section}{References}
+
+\end{document}
