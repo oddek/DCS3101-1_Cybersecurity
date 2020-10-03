@@ -76,10 +76,12 @@ texcl=true,
 
 \section{Abstract}
 
+This is the submission for the second assignment in the course DCS-3101, Introduction to Cybersecurity, at USN Kongsberg, fall of 2020.
+
 %Innholdsfortegnelse
 \section{Q1}
 
-There are several ways of visualizing an algorithm, i have chosen to include a visual representation first:
+There are several ways of displaying an algorithm, I have chosen to include a visual representation first:
 \begin{figure}[H]
  \centering
   \includegraphics[width=100pt]{img/decryptAES.png}
@@ -119,6 +121,23 @@ std::string AES::decrypt128BitMessage(std::string cipherText, std::string keyStr
 
 \newpage
 \section{Q2}
+
+
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=300pt]{img/AESKey1.png}
+ \caption{Calculating the first round key}
+ \end{figure}
+
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=300pt]{img/AESKey2.png}
+ \caption{Calculating the first column of the second round key}
+ \end{figure}
+
+
+
+
 \newpage
 \section{Q3}
 
@@ -175,7 +194,7 @@ The key and IV converted to binary looks like this:
  \end{figure}
 
 
-ECB is the simplest of the three modes of operation discussed in this assignment, and provide no additional security. The principle is to divide the text into blocks, encrypt them with whatever way we like, and concatenate the ciphertexts produced. This means that if you break one of the blocks, you will be able to break them all. However, an error will not propogate through the blocks. 
+ECB is the simplest of the three modes of operation discussed in this assignment, and provide no additional security. The principle is to divide the text into blocks, encrypt them with whatever way we like, and concatenate the ciphertexts produced. This means that if you break one of the blocks, you will be able to break them all. However, an error will not propagate through the blocks. 
 
 In practice it will look like this:
 %%%FIX XOR FUNCTION
@@ -199,7 +218,7 @@ In practice it will look like this:
 \newpage
 \subsection{2. CBC}
 
-As the complixity grows in the following operation modes, we will from here on use hexadecimal numbers for increased readability.
+As the complexity grows in the following operation modes, we will from here on use hexadecimal numbers for increased readability.
 
 In hex, the  input data, looks like this:
 \begin{tcolorbox}
@@ -228,12 +247,12 @@ The key and IV converted to binary looks like this:
  \caption{CBC encryption diagram from lecture}
  \end{figure}
 
-CBC stands for cipher-block chaining, and that is exactly what it does. Each plaintext block is XORed with the ciphertext of the previous block. For the first block, we XOR it with an IV (initialization vector). This ensures that each block is dependent on the previous one, and increases the security, as the breaking of one block, does not break the entire message. It does have error propogation however, so an error in a block, wil give an error in all the later blocks. 
+CBC stands for cipher-block chaining, and that is exactly what it does. Each plaintext block is XORed with the ciphertext of the previous block. For the first block, we XOR it with an IV (initialization vector). This ensures that each block is dependent on the previous one, and increases the security, as the breaking of one block, does not break the entire message. It does have error propagation however, so an error in a block, wil give an error in all the later blocks. 
 
 In practice it looks like this: 
 \begin{figure}[H]
  \centering
-  \includegraphics[width=300pt]{img/CBC.png}
+  \includegraphics[width=400pt]{img/CBC.png}
  \caption{Illustration of CBC}
  \end{figure}
 
@@ -264,7 +283,7 @@ OFB (Output feedback), does the block encryption on the IV, rather than on the p
 In practice it looks like this:
 \begin{figure}[H]
  \centering
-  \includegraphics[width=300pt]{img/OFB.png}
+  \includegraphics[width=400pt]{img/OFB.png}
  \caption{Illustration of OFB}
  \end{figure}
 
@@ -285,7 +304,7 @@ In practice it looks like this:
  \caption{OFB decryption diagram from lecture}
  \end{figure}
 
-In this assignment we will flip the last bit of the first output of the first block from the previos task, and see the effect it has on the decrypted message. 
+In this assignment we will flip the last bit of the first output of the first block from the previous task, and see the effect it has on the decrypted message. 
 
 The ciphertext with the flipped bit, looks like this: 
 \begin{tcolorbox}
@@ -299,7 +318,7 @@ The fourth hex digit 9, turned into an 8.
 
 \begin{figure}[H]
  \centering
-  \includegraphics[width=300pt]{img/OFBDec.png}
+  \includegraphics[width=400pt]{img/OFBDec.png}
  \caption{Illustration of OFB decryption with a flipped bit}
  \end{figure}
 
@@ -333,13 +352,31 @@ If we compare the results from the three modes:
 %\end{center}
 \end{tcolorbox}
 
-We of course se that they are drastically different. ECB is without the IV, so it will of course bear the least recemblence to the others. We can also see that while CBC and OFB start of similarly, they quickly divirge. 
+We of course see that they are drastically different. ECB is without the IV, so it will of course bear the least resemblance to the others. We can also see that while CBC and OFB start of similarly, they quickly diverge. 
 
 
-
+\newpage
 \section{Q4}
 
+In cryptography it is common to separate between two different types of encryption, namely \textit{symmetric} and \textit{asymmetric}.
 
+Symmetric encryption is the intuitive and oldest way of encrypting data, where one uses the same key to both encrypt and decrypt the data. There are countless examples of this, where perhaps the most common one today is AES. However the Caesar Cipher, Vignere Cipher and all encryption we did in task 3 are also examples of symmetric encryption. 
+
+Asymmetric encryption (also known as public key cryptography), differs from this, as it uses different keys for encryption and decryption. If Alice encrypts a message, Bob will not be able to decrypt the message with the same key. He will have to have the sibling key in the key-pair, to be able to make sense of the encrypted message. The most common example of asymmetric encryption is RSA. 
+
+In symmetric cryptography, we can usually in principle select any key we like. There are no inherent properties necessary within the key, so key generation is quite trivial. In asymmetric cryptography however, this is not the case. To generate an asymmetric key-pair, we use  mathematics to generate them. 
+
+In the case of RSA, we use modulo arithmetic and large primes, and take advantage of the fact that it is difficult to factor two large primes multiplied together. 
+
+The term public key cryptography comes with an interesting possibility that opens up when you have asymmetric encryption. Usually one takes the keys generated and refer to one of them as the public key, and the other as the private key. The public key you share openly while keeping the private key secret. 
+
+The reason for doing this, is to let anyone encrypt data with the public key, whilst knowing that you will be the only one able to decrypt it. This is quite practical in and of itself, but in addition to this, if you encrypt data with your private key, anyone who unlocks it with your public key can be sure that the integrity of the message has not been compromised. 
+
+These properties are not present in symmetric cryptography. Because of this, and the fact that the keys are generated with a lot more care, one usually argues that asymmetric cryptography is safer than symmetric cryptography. 
+
+Still, symmetric cryptography has its place, as the complexity of asymmetric cryptography is much higher and requires more overhead. 
+
+As I have understood it, a common approach is to use asymmetric cryptography, in order to agree on a symmetric key, and then do large data-transfers in the symmetric way. 
 
 
 %Vedlegg

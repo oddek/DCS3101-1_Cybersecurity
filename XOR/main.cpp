@@ -10,10 +10,10 @@ int main()
 
 
 
-	std::bitset<16> a(0x0B1A);
-	std::bitset<16> b(0x4f58);
+	std::bitset<8> a(0xfe);
+	std::bitset<8> b(0xd2);
 
-	std::bitset<16> c = (a ^ b);
+	std::bitset<8> c = (a ^ b);
 
 	std::cout << a << "\n";
 	std::cout << b << "\n";
