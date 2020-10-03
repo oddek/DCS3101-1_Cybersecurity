@@ -122,7 +122,7 @@ std::string AES::decrypt128BitMessage(std::string cipherText, std::string keyStr
 \newpage
 \section{Q3}
 
-ECB, CBC, OFB etc. are modes of operation i stream ciphers or when it comes to encrypting data that is longer than the block size given within a certain block cipher algorithm. For instance in AES, a block is 128 bits. If you however want to encrypt more data than this, we use for instance CBC in order to provide additional security across the blocks. The principle is to treat the blocks as a stream.
+ECB, CBC, OFB etc. are modes of operation in stream ciphers or when it comes to encrypting data that is longer than the block size given within a certain block cipher algorithm. For instance in AES, a block is 128 bits. If you however want to encrypt more data than this, we use for instance CBC in order to provide additional security across the blocks. The principle is to treat the blocks as a stream.
 
 In this task we have been given these parameters for demonstrating the different modes of operation:
 \begin{itemize}
@@ -165,7 +165,7 @@ The key and IV converted to binary looks like this:
 
 
 
-
+\newpage
 \subsection{1. ECB}
 
 \begin{figure}[H]
@@ -175,7 +175,7 @@ The key and IV converted to binary looks like this:
  \end{figure}
 
 
-ECB is the simplest of the three modes of operation discussed in this assignment, and provide no addition security. The principle is to divide the text into blocks, encrypt them with whatever way we like, and concatenate the ciphertexts produced. This means that if you break one of the blocks, you will be able to break them all. However, an error will not propogate through the blocks. 
+ECB is the simplest of the three modes of operation discussed in this assignment, and provide no additional security. The principle is to divide the text into blocks, encrypt them with whatever way we like, and concatenate the ciphertexts produced. This means that if you break one of the blocks, you will be able to break them all. However, an error will not propogate through the blocks. 
 
 In practice it will look like this:
 %%%FIX XOR FUNCTION
@@ -186,35 +186,155 @@ In practice it will look like this:
 \begin{center}
 \textcolor{blue}{
  01000100 01000011\quad 01010011 00101101\quad  00110011 00110001\quad  00110000 00110001\\
-\makebox[1.5cm]{\textbf{XOR}}\\
+\makebox[1.5cm]{\textbf{XOR}}\qquad  \makebox[1.5cm]{\textbf{XOR}}\qquad  \makebox[1.5cm]{\textbf{XOR}}\qquad  \makebox[1.5cm]{\textbf{XOR}}\\
 01000101 01010101\quad 01000101 01010101\quad 01000101 01010101\quad 01000101 01010101\\
 \makebox[1.5cm]{\textbf{=}}\\
-100010110000101100111100001110110011001000111010101100100
+00000001 00010110\quad 00010110 01111000\quad 01110110 01100100\quad 01110101 01100100
 }
 
 \end{center}
 \end{tcolorbox}
 \end{scriptsize}
 
-
+\newpage
 \subsection{2. CBC}
+
+As the complixity grows in the following operation modes, we will from here on use hexadecimal numbers for increased readability.
+
+In hex, the  input data, looks like this:
+\begin{tcolorbox}
+\begin{center}
+\textcolor{blue}{
+\makebox[1.5cm]{\textbf{DC}}:\qquad44 43\\
+\makebox[1.5cm]{\textbf{S-}}:\qquad53 2d\\
+\makebox[1.5cm]{\textbf{31}}:\qquad33 31\\
+\makebox[1.5cm]{\textbf{01}}:\qquad30 31}
+\end{center}
+\end{tcolorbox}
+
+The key and IV converted to binary looks like this: 
+\begin{tcolorbox}
+\begin{center}
+\textcolor{blue}{
+\makebox[1.5cm]{\textbf{IV}}:\qquad4e 4f\\
+\makebox[1.5cm]{\textbf{KEY}}:\qquad45 55}
+\end{center}
+\end{tcolorbox}
+
+
 \begin{figure}[H]
  \centering
   \includegraphics[width=300pt]{img/cbcLecture.png}
  \caption{CBC encryption diagram from lecture}
  \end{figure}
+
+CBC stands for cipher-block chaining, and that is exactly what it does. Each plaintext block is XORed with the ciphertext of the previous block. For the first block, we XOR it with an IV (initialization vector). This ensures that each block is dependent on the previous one, and increases the security, as the breaking of one block, does not break the entire message. It does have error propogation however, so an error in a block, wil give an error in all the later blocks. 
+
+In practice it looks like this: 
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=300pt]{img/CBC.png}
+ \caption{Illustration of CBC}
+ \end{figure}
+
+So the encrypted message becomes:
+\begin{tcolorbox}
+\begin{center}
+\textcolor{blue}{
+\makebox[1.5cm]{CBC Encrypted:}\qquad 4F 59 59 21 2F 45 5A 21}
+\end{center}
+\end{tcolorbox}
+
+
+
+
+
+\newpage
 \subsection{3. OFB}
+
+
 \begin{figure}[H]
  \centering
   \includegraphics[width=300pt]{img/ofbEnLecture.png}
  \caption{OFB encryption diagram from lecture}
  \end{figure}
+
+OFB (Output feedback), does the block encryption on the IV, rather than on the plaintext. It then XORS the plaintext with the output of the block encryption. The input in the following block encryptions however is the output of the previous block cipher (which does not involve the plaintext). Because of this no blocks are dependent on the plaintext or ciphertext of the previous block, which means that an error will only give an error in the current block (as we will see in the next part). 
+
+In practice it looks like this:
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=300pt]{img/OFB.png}
+ \caption{Illustration of OFB}
+ \end{figure}
+
+\begin{tcolorbox}
+\begin{center}
+\textcolor{blue}{
+\makebox[1.5cm]{OFB Encrypted:}\qquad 4F 59 1D 62 38 2B 7E 7E}
+\end{center}
+\end{tcolorbox}
+
+
+\newpage
 \subsection{4. OFB - Decryption}
+
 \begin{figure}[H]
  \centering
   \includegraphics[width=300pt]{img/ofbDeLecture.png}
  \caption{OFB decryption diagram from lecture}
  \end{figure}
+
+In this assignment we will flip the last bit of the first output of the first block from the previos task, and see the effect it has on the decrypted message. 
+
+The ciphertext with the flipped bit, looks like this: 
+\begin{tcolorbox}
+\begin{center}
+\textcolor{blue}{
+\makebox[1.5cm]{Ciphertext: }\qquad 4F 58 1D 62 38 2B 7E 7E}
+\end{center}
+\end{tcolorbox}
+The fourth hex digit 9, turned into an 8.
+
+
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=300pt]{img/OFBDec.png}
+ \caption{Illustration of OFB decryption with a flipped bit}
+ \end{figure}
+
+Decrypted message: 
+\begin{tcolorbox}
+\begin{center}
+\textcolor{blue}{
+\makebox[1.5cm]{Plaintext:}\qquad 44 42 53 2D 33 31 30 31}
+\end{center}
+\end{tcolorbox}
+
+
+If we take the decrypted message and turn it back into text, it will look like this:
+\begin{tcolorbox}
+\begin{center}
+\textcolor{blue}{
+\makebox[1.5cm]{Plaintext:}\qquad DBS-3101}
+\end{center}
+\end{tcolorbox}
+
+We can now see that the original C, has turned into a B. This corresponds with what we mentioned in the previous task, that the bit error only has an effect on one block. 
+
+\subsection{Comparision}
+If we compare the results from the three modes:
+\begin{tcolorbox}
+%\begin{center}
+\textcolor{blue}{
+\makebox[2cm]{ECB:}\qquad 01 16 16 78 76 64 75 64\\
+\makebox[2cm]{CBC:}\qquad 4F 59 59 21 2F 45 5A 21\\
+\makebox[2cm]{OFB:}\qquad 4F 59 1D 62 38 2B 7E 7E}
+%\end{center}
+\end{tcolorbox}
+
+We of course se that they are drastically different. ECB is without the IV, so it will of course bear the least recemblence to the others. We can also see that while CBC and OFB start of similarly, they quickly divirge. 
+
 
 
 \section{Q4}
