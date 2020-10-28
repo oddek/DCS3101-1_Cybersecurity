@@ -253,7 +253,7 @@ The key and IV converted to binary looks like this:
  \caption{CBC encryption diagram from lecture}
  \end{figure}
 
-CBC stands for cipher-block chaining, and that is exactly what it does. Each plaintext block is XORed with the ciphertext of the previous block, creating a chain. For the first block, we XOR it with an IV (initialization vector). This ensures that each block is dependent on the previous one, and increases the security, as the breaking of one block, does not break the entire message. It does have error propagation however, so an error in a block, wil give an error in all the later blocks. 
+CBC stands for cipher-block chaining, and that is exactly what it does. Each plaintext block is XORed with the ciphertext of the previous block, creating a chain. For the first block, we XOR it with an IV (initialization vector). This ensures that each block is dependent on the previous one, and increases the security, as the breaking of one block, does not break the entire message. It does have error propagation however, so an error in a block, will give an error in all the later blocks. 
 
 In practice it looks like this: 
 \begin{figure}[H]
@@ -385,8 +385,6 @@ Still, symmetric cryptography has its place, as the complexity of asymmetric cry
 As I have understood it, a common approach is to use asymmetric cryptography, in order to agree on a symmetric key, and then do large data-transfers in the symmetric way. 
 
 
-%Vedlegg
-\section{Appendices}
 
 
 \newpage

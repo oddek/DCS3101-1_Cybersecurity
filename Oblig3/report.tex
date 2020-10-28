@@ -1,0 +1,150 @@
+
+%\UseRawInputEncoding
+\documentclass{article}
+\setcounter{secnumdepth}{0}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%\usepackage[latin1]{inputenc}
+%\usepackage[english, norsk]{babel}
+\usepackage{filecontents}
+\usepackage{tcolorbox}
+\usepackage{url}
+\usepackage{etoolbox}
+\usepackage{framed}
+\usepackage{framed, color}
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage{float}
+\usepackage{gensymb}
+\usepackage{amsmath}
+
+\definecolor{Black}{rgb}{0.0, 0.0, 0.0}
+
+%Definer kode
+\usepackage{listings}
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+extendedchars = true,
+texcl=true,
+  language=C++,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\usepackage[colorlinks]{hyperref}
+\hypersetup{citecolor=Black}
+\hypersetup{linkcolor=Black}
+\hypersetup{urlcolor=Black}
+\usepackage{cleveref}
+
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+%\renewcommand{\baselinestretch}{2.0}
+
+%\renewcommand\thesubsection{\alph{subsection}}
+
+\renewcommand{\figurename}{Figure}
+\begin{document}
+\author{Kent Odde}
+\title{DCS3101\\Assignment 3}
+
+\maketitle
+\thispagestyle{empty}
+\begin{center}
+\includegraphics[width=\linewidth,height=0.2\textheight,keepaspectratio]{img/USN.png}
+\end{center}
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Abstract}
+
+\section{Q1}
+\begin{tcolorbox}\textit{What are the advantages of firewalls?}\end{tcolorbox}
+
+\section{Q2}
+\begin{tcolorbox}
+  \textit{Comment if the following is true or false in the context of TLS - "The algorithms inside a session are negotiated between client and server." Justify your answer with an associated protocol diagram.}
+\end{tcolorbox}
+
+
+
+
+\section{Q3}
+\begin{tcolorbox}
+  \textit{It was discussed in the class about one particular attack on TLS. Discuss this attack and identify another attack that can impact TLS. Discuss briefly about the attack you have chosen for your answer.}
+\end{tcolorbox}
+
+
+
+
+
+
+
+\section{Q4}
+\begin{tcolorbox}
+  \textit{What are the differences between IDS and IPS? Discuss on classification/taxonomy of IDS and IPS.}
+\end{tcolorbox}
+
+
+
+
+
+\section{Q5}
+\begin{tcolorbox}
+  \textit{Biometrics - What are the key factors for choosing a biometric modality (e.g., face, fingerprint, iris, etc)?}
+\end{tcolorbox}
+
+
+\section{Q6}
+\begin{tcolorbox}
+  \textit{What kind of attacks are possible on face biometric systems?}
+\end{tcolorbox}
+
+
+
+
+
+
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=300pt]{img/usn.png}
+ \caption{..}
+ \end{figure}
+
+
+
+
+%Vedlegg
+\section{Appendices}
+
+
+\newpage
+%Referanse
+%\section{Referanser}
+
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{ref}
+
+\addcontentsline{toc}{section}{References}
+
+\end{document}
