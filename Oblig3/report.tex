@@ -133,42 +133,84 @@ The heartbeat protocol, is a mechanism for letting the client check that the con
 However, it was discoverd that if the number containing the length of the string was much higher than the actual length of the string, the server would in addition to the string send random content of its RAM. This was of course catastrophic, as a web-servers RAM is filled with a lot of information that can be exploited, like encryption keys and so on.
 
 
+When it comes to other TLS vulnerabilites, there are plenty to choose from. They can be categorized into whether they arise from a flaw in the initial concept of TLS, the implementation, etc. Since heartbleed can be categorized as an implementation bug, I have chosen to write about a concept flaw.
 
+\textbf{FREAK}
 
+Freak is an acronym, and means \textit{Factoring RSA Export Keys}. In the 1990's computing power was scarce among the general public, and encryption did not have to be very strong to still be reckoned as secure. Previous to this, the American government had put a ban on the export of strong cryptographic technology, limiting applications meant for export to use RSA with a maximum of 512 bits. The upside to this was that the NSA was able to break these ciphers, but in essence, nobody else would.
+
+However, throughout the 2000's computing power became more widespread. This meant that in essence, anybody would be able to break them. Luckily the cryptographic export laws were abolished in 2000, so by this time, most applications had moved on to stronger encryption.
+
+The Freak attack however, made use of the fact that encryption of export grade were still available in a lot of applications and on a lot of servers. This allowed for a man in the middle, to trick clients to use weaker cryptographic schemes, and then easily decrypt the information sent.
+
+This attack is no longer possible in TLS 1.3, as it no longer allows for a downgrade to the weaker protocols.
 
 \newpage
 \section{Q4}
 \begin{tcolorbox}
   \textit{What are the differences between IDS and IPS? Discuss on classification/taxonomy of IDS and IPS.}
 \end{tcolorbox}
+In order to see the differences more easily, lets start with looking at the similarities.
 
+Intrusion Detection Systems and Intrusion Prevention Systems are both constructs i the network infrastructure. They will analyze packets in the network, and in various ways check whether or not the packet is deemed as a threat. This is most commonly done by comparing the packet with the contents of a database, storing known malicious threats.
 
+The main difference however is that while they both monitor the network and try to detect threats, an IPS will also prevent malicious packets from entering the internal network. In other words they live more in the domain of firewalls.
 
+IDS can be separated into two main categories, based on the implementation:
+\begin{itemize}
+  \item{\textbf{Host Instrusion Detection}\\Individual host implementation. Dependent on the logs within the host. May take up a lot of resources on the host.}
+  \item{\textbf{Network Intrusion Dectection System}\\Monitors traffic on the network, to and from all hosts. It is easy to implement.}
+\end{itemize}
 
+However, we can also categorize them based on their method of threat detection:
+\begin{itemize}
+  \item{\textbf{Signature-based Intrusion Detection Systems}\\Looks for specific bit sequences in the packet payload, which has been flagged as a possible threat. Can not detect new threats.}
+  \item{\textbf{Anomaly-based Intrusion Detection Systems}\\The system uses training data, to learn what is deemed as \textit{normal} traffic, and then it looks for packets which deviate from the norm to a certian degree.}
+\end{itemize}
 
+As far as I could find, IPS is also classified by the same categories as IDS, as it of course has a detection system within. I could unfortunately not find any categories or differences of how the actual prevention is done.
+
+\newpage
 \section{Q5}
 \begin{tcolorbox}
   \textit{Biometrics - What are the key factors for choosing a biometric modality (e.g., face, fingerprint, iris, etc)?}
 \end{tcolorbox}
+As with every other choice, the decision of which biometric modality to use depends on the particular use case.
+
+If one is dependent on extremely robust security, the best choice will differ than if they key factor was user conveniance and security was second priority.
+
+The metrics of modalities as mentioned in the lectures are great ways for making this decision:
+
+\begin{itemize}
+  \item{Failure-to-Capture Rate}
+  \item{Failure-to-Extract Rate}
+  \item{Failure-to-Enrol Rate}
+  \item{Failure to Acquire Rate}
+  \item{False-Match-Rate}
+  \item{False-Non-Match Rate}
+\end{itemize}
+The first four points are very important if the goal is user conveniance, as a lot of failures of creating and storing a template will result in irritation. However, if the key goal is security, high numbers here may be acceptable.
+
+The two last points will be a trade off between usability and security. If the false match rate is virtually zero, the false non match rate will probably be higher. As no system is perfect, this will be a choice depending on how critical security is.
 
 
+\newpage
 \section{Q6}
 \begin{tcolorbox}
   \textit{What kind of attacks are possible on face biometric systems?}
 \end{tcolorbox}
 
+Face biometric systems may be succeptible to several attacks, based on the sophistocation of the implementation.
 
+The most obvious one is of course just threatening the person to which a face belongs, to unlock the system. However, this sort of attack is not very sophisticated, carries great risk, and is quite rare.
 
+Among the more realistic attacks, they all revolve around simulating the face in some way. These are often called presentation attacks.
 
+You can have a photograph of a face, a video of a face or various types of masks.
 
+Whether or not these work, depend on the implementation. To combat them one may use sensors or 3D-cameras to make sure that there is in fact a person present. One may also use particular expressions or movements in the face when storing the template.
 
-
-
-
-
-%Vedlegg
-\section{Appendices}
-
+There are also more classical attacks, that apply for all sorts of security, where one tries to access the system, and manipulate the template database or weaken the match acceptance criteria.
 
 \newpage
 %Referanse
