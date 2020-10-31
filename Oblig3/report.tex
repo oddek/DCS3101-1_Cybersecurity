@@ -88,13 +88,13 @@ A firewall is a component, that functions as a check-point in a network, and its
 
 The main use case and advantage of a firewall, is that we can protect a local trusted network against threats which might exist on another untrusted network.
 
-When implemented, all traffic passing from network A to network B must pass through the firewall. The firewall may prohibit traffic it considers a threat. This decision has traditionally been based on a predefined ruleset, but next-generation firewalls have much more sophisticated methods of identifying potential threats.
+When implemented, all traffic passing from network A to network B must pass through the firewall. The firewall may prohibit traffic it considers a threat. This decision has traditionally been based on a predefined rule set, but next-generation firewalls have much more sophisticated methods of identifying potential threats.
 
-A strength of firewalls is their wide range of types suitable for different needs, and their capability for configuration. We can have an open firewall, where we define rules for what the firewall should filter out, or for a more conservative approach, we can have a firewall which filters all packages, and we whitelist the traffic we do want.
+A strength of firewalls is their wide range of types suitable for different needs, and their capability for configuration. We can have an open firewall, where we define rules for what the firewall should filter out, or for a more conservative approach, we can have a firewall which filters all packages, and we white-list the traffic we do want.
 
 We can filter traffic based the sender or receiver or by the contents of the packets, which can be used to protect specific hosts or specific ports. We can filter based on the types of application layer protocol the package contains, which can help us filter out spam mail etc. We can also use the TCP headers, so that an outgoing TCP packet on a port, will temporarily open the port for incoming packets, given that the TCP header contain the correct information.
 
-There are also \textit{next-generation} firewalls, which can employ machine learning to be able to recognize unknown types of malicous traffic based on patterns.
+There are also \textit{next-generation} firewalls, which can employ machine learning to be able to recognize unknown types of malicious traffic based on patterns.
 
 As an added bonus of all this, we can also configure firewalls to log all traffic, which may be very handy for several reasons, but especially if we find out that our network has been compromised.
 
@@ -130,10 +130,10 @@ The attack discussed in class was the exploitation of what has come to be known 
 
 The heartbeat protocol, is a mechanism for letting the client check that the connection with the server is still active. The client would send a message asking for a distinct string as a reply, and the character length of this string. If the connection was still alive, the server would naturally send the requested string back.
 
-However, it was discoverd that if the number containing the length of the string was much higher than the actual length of the string, the server would in addition to the string send random content of its RAM. This was of course catastrophic, as a web-servers RAM is filled with a lot of information that can be exploited, like encryption keys and so on.
+However, it was discovered that if the number containing the length of the string was much higher than the actual length of the string, the server would in addition to the string send random content of its RAM. This was of course catastrophic, as a web-servers RAM is filled with a lot of information that can be exploited, like encryption keys and so on.
 
 
-When it comes to other TLS vulnerabilites, there are plenty to choose from. They can be categorized into whether they arise from a flaw in the initial concept of TLS, the implementation, etc. Since heartbleed can be categorized as an implementation bug, I have chosen to write about a concept flaw.
+When it comes to other TLS vulnerabilities, there are plenty to choose from. They can be categorized into whether they arise from a flaw in the initial concept of TLS, the implementation, etc. Since heartbleed can be categorized as an implementation bug, I have chosen to write about a concept flaw.
 
 \textbf{FREAK}
 
@@ -158,14 +158,14 @@ The main difference however is that while they both monitor the network and try 
 
 IDS can be separated into two main categories, based on the implementation:
 \begin{itemize}
-  \item{\textbf{Host Instrusion Detection}\\Individual host implementation. Dependent on the logs within the host. May take up a lot of resources on the host.}
-  \item{\textbf{Network Intrusion Dectection System}\\Monitors traffic on the network, to and from all hosts. It is easy to implement.}
+  \item{\textbf{Host Intrusion Detection}\\Individual host implementation. Dependent on the logs within the host. May take up a lot of resources on the host.}
+  \item{\textbf{Network Intrusion Detection System}\\Monitors traffic on the network, to and from all hosts. It is easy to implement.}
 \end{itemize}
 
 However, we can also categorize them based on their method of threat detection:
 \begin{itemize}
   \item{\textbf{Signature-based Intrusion Detection Systems}\\Looks for specific bit sequences in the packet payload, which has been flagged as a possible threat. Can not detect new threats.}
-  \item{\textbf{Anomaly-based Intrusion Detection Systems}\\The system uses training data, to learn what is deemed as \textit{normal} traffic, and then it looks for packets which deviate from the norm to a certian degree.}
+  \item{\textbf{Anomaly-based Intrusion Detection Systems}\\The system uses training data, to learn what is deemed as \textit{normal} traffic, and then it looks for packets which deviate from the norm to a certain degree.}
 \end{itemize}
 
 As far as I could find, IPS is also classified by the same categories as IDS, as it of course has a detection system within. I could unfortunately not find any categories or differences of how the actual prevention is done.
@@ -177,7 +177,7 @@ As far as I could find, IPS is also classified by the same categories as IDS, as
 \end{tcolorbox}
 As with every other choice, the decision of which biometric modality to use depends on the particular use case.
 
-If one is dependent on extremely robust security, the best choice will differ than if they key factor was user conveniance and security was second priority.
+If one is dependent on extremely robust security, the best choice will differ than if they key factor was user convenience and security was second priority.
 
 The metrics of modalities as mentioned in the lectures are great ways for making this decision:
 
@@ -189,7 +189,7 @@ The metrics of modalities as mentioned in the lectures are great ways for making
   \item{False-Match-Rate}
   \item{False-Non-Match Rate}
 \end{itemize}
-The first four points are very important if the goal is user conveniance, as a lot of failures of creating and storing a template will result in irritation. However, if the key goal is security, high numbers here may be acceptable.
+The first four points are very important if the goal is user convenience, as a lot of failures of creating and storing a template will result in irritation. However, if the key goal is security, high numbers here may be acceptable.
 
 The two last points will be a trade off between usability and security. If the false match rate is virtually zero, the false non match rate will probably be higher. As no system is perfect, this will be a choice depending on how critical security is.
 
@@ -200,7 +200,7 @@ The two last points will be a trade off between usability and security. If the f
   \textit{What kind of attacks are possible on face biometric systems?}
 \end{tcolorbox}
 
-Face biometric systems may be succeptible to several attacks, based on the sophistocation of the implementation.
+Face biometric systems may be susceptible to several attacks, based on the sophistication of the implementation.
 
 The most obvious one is of course just threatening the person to which a face belongs, to unlock the system. However, this sort of attack is not very sophisticated, carries great risk, and is quite rare.
 
