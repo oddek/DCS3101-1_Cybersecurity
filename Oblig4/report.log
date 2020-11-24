@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2020.9.9)  4 NOV 2020 17:01
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2020.9.9)  18 NOV 2020 16:32
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -824,9 +824,9 @@ k> </home/kent/.texlive2019/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600p
 k> </home/kent/.texlive2019/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600p
 k> </home/kent/.texlive2019/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1728.600p
 k>
-Output written on report.pdf (4 pages, 441742 bytes).
+Output written on report.pdf (4 pages, 442040 bytes).
 PDF statistics:
- 199 PDF objects out of 1000 (max. 8388607)
+ 200 PDF objects out of 1000 (max. 8388607)
  66 compressed objects within 1 object stream
  10 named destinations out of 1000 (max. 500000)
  47 words of extra memory for PDF output out of 10000 (max. 10000000)
